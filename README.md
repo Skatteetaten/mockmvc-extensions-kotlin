@@ -36,6 +36,8 @@ If you send in placeholders in the `UrlTemplate`, for example `UrlTemplate("/tes
 the WireMock stubs generated will contain a wildcard for the placeholder.
 This means that both the path `/test/123` and `/test/abc` will match.
 
+For information on how to setup the contract consumer see the [Spring Cloud Contract documentation](https://cloud.spring.io/spring-cloud-contract/spring-cloud-contract.html#_client_side)
+
 ### Build script
 
 The build script must package the stub-jar file,
