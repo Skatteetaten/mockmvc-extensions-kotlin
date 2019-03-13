@@ -14,14 +14,13 @@ mockMvc.get(urlTemplate = UrlTemplate("/test")) {
 }
 ```
 
-## Json path
-
-Equals value:
+There are also convenience methods for asserting with JsonPath.  
+*Equals value:*
 ```
 it.statusIsOk().responseJsonPath("$.value").equalsValue("test")
 ```
 
-Equals object:
+*Equals object:*
 ```
 it.statusIsOk().responseJsonPath("$").equalsObject(TestObject())
 ```

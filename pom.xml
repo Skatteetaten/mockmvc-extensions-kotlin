@@ -10,7 +10,7 @@
   <packaging>jar</packaging>
 
   <name>MockMvc extensions Kotlin</name>
-  <description>Simplifies the setup of mockMvc tests combined with generation of restdocs and Spring Cloud Contract stubs</description>
+  <description>Simplifies the setup of MockMvc tests combined with generation of restdocs and Spring Cloud Contract stubs</description>
   <url>https://github.com/Skatteetaten/mockmvc-extensions-kotlin</url>
 
   <properties>
