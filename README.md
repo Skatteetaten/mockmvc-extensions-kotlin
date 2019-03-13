@@ -17,8 +17,8 @@ mockMvc.get(urlTemplate = UrlTemplate("/test")) {
 ---
 
 There are also convenience methods for asserting with JsonPath.  
-*Equals value:* `it.statusIsOk().responseJsonPath("$.value").equalsValue("test")`
-*Equals object:* `it.statusIsOk().responseJsonPath("$").equalsObject(TestObject())`
+* *Equals value:* `it.statusIsOk().responseJsonPath("$.value").equalsValue("test")`
+* *Equals object:* `it.statusIsOk().responseJsonPath("$").equalsObject(TestObject())`
 
 ## Rest docs
 
