@@ -5,19 +5,22 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.tomakehurst.wiremock.client.MappingBuilder
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.matching
+import com.github.tomakehurst.wiremock.matching.RegexPattern
+import com.github.tomakehurst.wiremock.matching.UrlPattern
 import com.jayway.jsonpath.JsonPath
+import org.hamcrest.Matchers.equalTo
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.springframework.cloud.contract.wiremock.restdocs.ContractResultHandler
 import org.springframework.cloud.contract.wiremock.restdocs.WireMockRestDocs
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultActions
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
-import org.springframework.web.util.UriComponentsBuilder
-import org.hamcrest.Matchers.equalTo
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.web.util.UriComponentsBuilder
 
 fun HttpHeaders.authorization(value: String): HttpHeaders {
     this.set(HttpHeaders.AUTHORIZATION, value)
@@ -25,28 +28,42 @@ fun HttpHeaders.authorization(value: String): HttpHeaders {
 }
 
 data class MockMvcData(val requestUrl: String, val results: ResultActions) : ResultActions by results {
-    fun get() = WireMock.get(requestUrl)!!
+    private val containsPlaceholder = Regex(pattern = "\\{.+?}")
+
+    fun get(): MappingBuilder = getWireMockUrl()?.let { WireMock.get(it) } ?: WireMock.get(requestUrl)
+
+    fun getWireMockUrl(): UrlPattern? =
+        if (requestUrl.contains(containsPlaceholder)) {
+            UrlPattern(RegexPattern(requestUrl.replace(containsPlaceholder, ".+")), true)
+        } else {
+            null
+        }
+}
+
+class UrlTemplate(val template: String, vararg val vars: String) {
+    fun urlString() = UriComponentsBuilder.fromUriString(template).buildAndExpand(*vars).encode().toUri().toString()
 }
 
 fun MockMvc.get(
     headers: HttpHeaders? = null,
-    docsIdentifier: String,
-    urlTemplate: String,
-    vararg uriVars: String,
+    docsIdentifier: String? = null,
+    urlTemplate: UrlTemplate,
     fn: (mockMvcData: MockMvcData) -> Unit
 ) {
-    val url = UriComponentsBuilder.fromUriString(urlTemplate).buildAndExpand(*uriVars).encode().toUri()
-    val builder = MockMvcRequestBuilders.get(urlTemplate, *uriVars)
+    val builder = MockMvcRequestBuilders.get(urlTemplate.urlString(), *urlTemplate.vars)
     headers?.let { builder.headers(it) }
 
     val resultActions = this.perform(builder)
-    val mock = MockMvcData(url.toString(), resultActions)
+    val mock = MockMvcData(urlTemplate.template, resultActions)
     fn(mock)
 
     headers?.keys?.forEach {
         mock.andDo(WireMockRestDocs.verify().wiremock(mock.get().withHeader(it, matching(".+"))))
     }
-    mock.andDo(document(docsIdentifier))
+
+    docsIdentifier?.let {
+        mock.andDo(document(it))
+    }
 }
 
 fun ContractResultHandler.get(mockMvcData: MockMvcData): MappingBuilder? {
@@ -55,7 +72,8 @@ fun ContractResultHandler.get(mockMvcData: MockMvcData): MappingBuilder? {
     return get
 }
 
-fun ResultActions.status(expected: HttpStatus) = this.andExpect(status().`is`(expected.value()))
+fun ResultActions.status(expected: HttpStatus): ResultActions = this.andExpect(status().`is`(expected.value()))
+fun ResultActions.statusIsOk(): ResultActions = this.andExpect(status().`is`(HttpStatus.OK.value()))
 
 data class JsonPathEquals(val expression: String, val resultActions: ResultActions) {
     fun equalsValue(value: Any): ResultActions {
@@ -67,7 +85,7 @@ data class JsonPathEquals(val expression: String, val resultActions: ResultActio
         val expectedValue = jacksonObjectMapper().convertValue<LinkedHashMap<String, *>>(expected)
         resultActions.andExpect {
             val response = JsonPath.read<LinkedHashMap<String, *>>(it.response.contentAsString, expression)
-            // assertThat(response).isEqualTo(expectedValue)
+            assertEquals(expectedValue, response)
         }
         return resultActions
     }
