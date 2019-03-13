@@ -1,5 +1,11 @@
 # MockMvc extensions Kotlin
 
+This project was created to have one source, the unit test, for documentation and contracts.
+It simplifies the setup of `MockMvc` tests that generates [restdocs](https://spring.io/projects/spring-restdocs)
+and wiremock stubs using [Spring cloud contract](https://spring.io/projects/spring-cloud-contract).
+
+For examples look at the [unit tests](https://github.com/Skatteetaten/mockmvc-extensions-kotlin/blob/master/src/test/kotlin/no/skatteetaten/aurora/mockmvc/extensions/ControllerIntegrationTest.kt).
+
 ## Usage
 
 ```
@@ -28,6 +34,13 @@ mockMvc.get(docsIdentifier = "my-docs", urlTemplate = UrlTemplate("/test")) {
   ...
 }
 ```
+
+## WireMock
+
+The stubs generated will automatically use the input to the test.
+If you send in placeholders in the `UrlTemplate`, for example `UrlTemplate("/test/{id}", "123")`,
+the WireMock stubs generated will contain a wildcard for the placeholder.
+This means that both the path `/test/123` and `/test/abc` will match.
 
 ### Build script
 
