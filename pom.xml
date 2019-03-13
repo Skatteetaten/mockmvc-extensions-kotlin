@@ -10,8 +10,44 @@
   <packaging>jar</packaging>
 
   <name>MockMvc extensions Kotlin</name>
-  <description>Simplifies the setup of MockMvc tests combined with generation of restdocs and Spring Cloud Contract stubs</description>
+  <description>
+    Simplifies setup of MockMvc tests combined with generation of restdocs and Spring Cloud Contract stubs
+  </description>
   <url>https://github.com/Skatteetaten/mockmvc-extensions-kotlin</url>
+
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
+
+  <scm>
+    <url>https://github.com/Skatteetaten/mockmvc-extensions-kotlin</url>
+    <connection>git@github.com:Skatteetaten/mockmvc-extensions-kotlin.git</connection>
+    <developerConnection>git@github.com:Skatteetaten/mockmvc-extensions-kotlin.git</developerConnection>
+  </scm>
+
+  <developers>
+    <developer>
+      <id>bjartek</id>
+      <name>Bjarte S. Karlsen</name>
+      <email>bjarte.karlsen@skatteetaten.no</email>
+    </developer>
+    <developer>
+      <id>jarlehansen</id>
+      <name>Jarle Hansen</name>
+      <email>jarle.hansen@skatteetaten.no</email>
+    </developer>
+  </developers>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -130,5 +166,65 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>sign</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>build-extras</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>3.0.1</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>3.1.0</version>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>
