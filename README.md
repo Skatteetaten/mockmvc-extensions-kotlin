@@ -2,7 +2,7 @@
 
 This project was created to have one source, the unit test, for documentation and contracts.
 It simplifies the setup of `MockMvc` tests that generates [restdocs](https://spring.io/projects/spring-restdocs)
-and wiremock stubs using [Spring cloud contract](https://spring.io/projects/spring-cloud-contract).
+and wiremock stubs using [Spring Cloud Contract](https://spring.io/projects/spring-cloud-contract).
 
 For examples look at the [unit tests](https://github.com/Skatteetaten/mockmvc-extensions-kotlin/blob/master/src/test/kotlin/no/skatteetaten/aurora/mockmvc/extensions/ControllerIntegrationTest.kt).
 
@@ -31,7 +31,7 @@ To generate rest docs add `@AutoConfigureRestDocs` to your unit test class and i
 mockMvc.get(docsIdentifier = "my-docs", urlTemplate = UrlTemplate("/test")) { ... }
 ```
 
-This will by default generate the restdocs snippets in `<target/build>/generated-snippets/<docsIdentifier>/*.adoc`.
+This will by default generate the restdocs snippets in `<target/build>/generated-snippets/<docsIdentifier>/*.adoc`
 
 ## WireMock
 
