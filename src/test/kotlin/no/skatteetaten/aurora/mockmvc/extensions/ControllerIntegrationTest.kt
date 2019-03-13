@@ -1,20 +1,25 @@
 package no.skatteetaten.aurora.mockmvc.extensions
 
+import assertk.assertThat
+import assertk.assertions.isEqualTo
 import no.skatteetaten.aurora.mockmvc.extensions.testutils.TestController
 import no.skatteetaten.aurora.mockmvc.extensions.testutils.TestObject
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpHeaders
 import org.springframework.restdocs.RestDocumentationExtension
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
+import java.io.File
 
 @ExtendWith(SpringExtension::class, RestDocumentationExtension::class)
 @SpringBootTest(classes = [TestController::class])
 @AutoConfigureMockMvc
+@AutoConfigureRestDocs
 class ControllerIntegrationTest {
 
     @Autowired
@@ -44,5 +49,17 @@ class ControllerIntegrationTest {
         }
     }
 
+    @Test
+    fun `Get request with rest docs`() {
+        val restDocsIdentifier = "get-with-restdocs"
+        mockMvc.get(
+            docsIdentifier = restDocsIdentifier,
+            urlTemplate = UrlTemplate("/test")
+        ) {
+            it.statusIsOk().responseJsonPath("$.value").equalsValue("test")
+        }
 
+        val stubFileName = File("target/generated-snippets/stubs").listFiles().first().name
+        assertThat("$restDocsIdentifier.json").isEqualTo(stubFileName)
+    }
 }
