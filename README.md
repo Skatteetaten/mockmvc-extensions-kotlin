@@ -14,6 +14,8 @@ mockMvc.get(urlTemplate = UrlTemplate("/test")) {
 }
 ```
 
+---
+
 There are also convenience methods for asserting with JsonPath.  
 *Equals value:*
 ```
