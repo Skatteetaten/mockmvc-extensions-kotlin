@@ -45,4 +45,4 @@ For information on how to setup the contract consumer see the [Spring Cloud Cont
 ### Build script
 
 The build script must package the stub-jar file,
-for more details take a look at [this sample from Spring Cloud contract](https://github.com/spring-cloud-samples/spring-cloud-contract-samples/blob/master/producer_with_restdocs/build.gradle#L83)
+for more details take a look at [this sample from Spring Cloud Contract](https://github.com/spring-cloud-samples/spring-cloud-contract-samples/blob/master/producer_with_restdocs/build.gradle#L83)
