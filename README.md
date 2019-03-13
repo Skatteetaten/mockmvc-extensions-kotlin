@@ -40,6 +40,9 @@ If you send in placeholders in the `UrlTemplate`, for example `UrlTemplate("/tes
 the WireMock stubs generated will contain a wildcard for the placeholder.
 This means that both the path `/test/123` and `/test/abc` will match.
 
+Header values will also be checked if they contain a value and not a specific value.
+Meaning that a Header with `Bearer abc123` will also match `Bearer 12345`.
+
 For information on how to setup the contract consumer see the [Spring Cloud Contract documentation](https://cloud.spring.io/spring-cloud-contract/spring-cloud-contract.html#_client_side)
 
 ### Build script
