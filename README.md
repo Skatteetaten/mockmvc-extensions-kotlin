@@ -9,7 +9,11 @@ For examples look at the [unit tests](https://github.com/Skatteetaten/mockmvc-ex
 ## Usage
 
 ```
-mockMvc.get(urlTemplate = UrlTemplate("/test")) {
+mockMvc.get(
+  headers = HttpHeaders().authorization("test"),
+  docsIdentifier = "my-docs",
+  urlTemplate = UrlTemplate("/test")
+) {
    it.statusIsOk().responseJsonPath("$.value").equalsValue("test")
 }
 ```
