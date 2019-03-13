@@ -28,9 +28,7 @@ There are also convenience methods for asserting with JsonPath.
 
 To generate rest docs include the `docsIdentifier`:
 ```
-mockMvc.get(docsIdentifier = "my-docs", urlTemplate = UrlTemplate("/test")) {
-  ...
-}
+mockMvc.get(docsIdentifier = "my-docs", urlTemplate = UrlTemplate("/test")) { ... }
 ```
 
 ## WireMock
