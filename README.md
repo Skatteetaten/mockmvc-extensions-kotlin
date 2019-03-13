@@ -26,10 +26,12 @@ There are also convenience methods for asserting with JsonPath.
 
 ## Rest docs
 
-To generate rest docs include the `docsIdentifier`:
+To generate rest docs add `@AutoConfigureRestDocs` to your unit test class and include the `docsIdentifier`:
 ```
 mockMvc.get(docsIdentifier = "my-docs", urlTemplate = UrlTemplate("/test")) { ... }
 ```
+
+This will by default generate the restdocs snippets in `<target/build>/generated-snippets/<docsIdentifier>/*.adoc`.
 
 ## WireMock
 
