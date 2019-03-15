@@ -1,7 +1,6 @@
 package no.skatteetaten.aurora.mockmvc.extensions.wiremock
 
 import com.github.tomakehurst.wiremock.common.FileSource
-import com.github.tomakehurst.wiremock.extension.Extension
 import com.github.tomakehurst.wiremock.extension.Parameters
 import com.github.tomakehurst.wiremock.extension.ResponseTransformer
 import com.github.tomakehurst.wiremock.http.HttpHeader
@@ -11,11 +10,7 @@ import com.github.tomakehurst.wiremock.http.Response
 import org.springframework.cloud.contract.verifier.dsl.wiremock.WireMockExtensions
 
 class MockMvcWireMockExtensions : WireMockExtensions {
-    override fun extensions(): MutableList<Extension> {
-        return mutableListOf(
-            ConnectionHeaderTransformer()
-        )
-    }
+    override fun extensions() = mutableListOf(ConnectionHeaderTransformer())
 }
 
 class ConnectionHeaderTransformer : ResponseTransformer() {
