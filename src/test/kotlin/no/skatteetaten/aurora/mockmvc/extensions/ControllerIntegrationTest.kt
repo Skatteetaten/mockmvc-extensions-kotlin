@@ -33,9 +33,37 @@ class ControllerIntegrationTest {
     }
 
     @Test
-    fun `Get request with header`() {
+    fun `Post request with json response`() {
+        mockMvc.post(urlTemplate = UrlTemplate("/test"), body = "test123") {
+            it.statusIsOk().responseJsonPath("$.value").equalsValue("test")
+        }
+    }
+
+    @Test
+    fun `Put request with json response`() {
+        mockMvc.put(urlTemplate = UrlTemplate("/test"), body = "test123") {
+            it.statusIsOk().responseJsonPath("$.value").equalsValue("test")
+        }
+    }
+
+    @Test
+    fun `Patch request with json response`() {
+        mockMvc.patch(urlTemplate = UrlTemplate("/test"), body = "test123") {
+            it.statusIsOk().responseJsonPath("$.value").equalsValue("test")
+        }
+    }
+
+    @Test
+    fun `Delete request with json response`() {
+        mockMvc.delete(urlTemplate = UrlTemplate("/test"), body = "test123") {
+            it.statusIsOk()
+        }
+    }
+
+    @Test
+    fun `Get request with headers`() {
         mockMvc.get(
-            headers = HttpHeaders().authorization("test"),
+            headers = HttpHeaders().authorization("test").header("x-my-custom-header", "abc123"),
             urlTemplate = UrlTemplate("/test-with-header")
         ) {
             it.statusIsOk().responseJsonPath("$.header").equalsValue("test")
