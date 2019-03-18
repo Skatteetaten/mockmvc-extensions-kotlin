@@ -12,7 +12,7 @@ For examples look at the [unit tests](https://github.com/Skatteetaten/mockmvc-ex
 mockMvc.get(
   headers = HttpHeaders().authorization("test"),
   docsIdentifier = "my-docs",
-  urlTemplate = UrlTemplate("/test")
+  pathTemplate = PathTemplate("/test")
 ) {
    it.statusIsOk().responseJsonPath("$.value").equalsValue("test")
 }
@@ -28,7 +28,7 @@ There are also convenience methods for asserting with JsonPath.
 
 To generate rest docs add `@AutoConfigureRestDocs` to your unit test class and include the `docsIdentifier`:
 ```
-mockMvc.get(docsIdentifier = "my-docs", urlTemplate = UrlTemplate("/test")) { ... }
+mockMvc.get(docsIdentifier = "my-docs", pathTemplate = ExactPath("/test")) { ... }
 ```
 
 This will by default generate the restdocs snippets in `<target/build>/generated-snippets/<docsIdentifier>/*.adoc`

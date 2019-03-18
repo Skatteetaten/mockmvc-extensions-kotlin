@@ -27,35 +27,35 @@ class ControllerIntegrationTest {
 
     @Test
     fun `Get request with json response`() {
-        mockMvc.get(urlTemplate = UrlTemplate("/test")) {
+        mockMvc.get(pathBuilder = PathTemplate("/test")) {
             it.statusIsOk().responseJsonPath("$.value").equalsValue("test")
         }
     }
 
     @Test
     fun `Post request with json response`() {
-        mockMvc.post(urlTemplate = UrlTemplate("/test"), body = "test123") {
+        mockMvc.post(pathBuilder = PathTemplate("/test"), body = "test123") {
             it.statusIsOk().responseJsonPath("$.value").equalsValue("test")
         }
     }
 
     @Test
     fun `Put request with json response`() {
-        mockMvc.put(urlTemplate = UrlTemplate("/test"), body = "test123") {
+        mockMvc.put(pathBuilder = PathTemplate("/test"), body = "test123") {
             it.statusIsOk().responseJsonPath("$.value").equalsValue("test")
         }
     }
 
     @Test
     fun `Patch request with json response`() {
-        mockMvc.patch(urlTemplate = UrlTemplate("/test"), body = "test123") {
+        mockMvc.patch(pathBuilder = PathTemplate("/test"), body = "test123") {
             it.statusIsOk().responseJsonPath("$.value").equalsValue("test")
         }
     }
 
     @Test
     fun `Delete request with json response`() {
-        mockMvc.delete(urlTemplate = UrlTemplate("/test"), body = "test123") {
+        mockMvc.delete(pathBuilder = PathTemplate("/test"), body = "test123") {
             it.statusIsOk()
         }
     }
@@ -64,7 +64,7 @@ class ControllerIntegrationTest {
     fun `Get request with headers`() {
         mockMvc.get(
             headers = HttpHeaders().authorization("test").header("x-my-custom-header", "abc123"),
-            urlTemplate = UrlTemplate("/test-with-header")
+            pathBuilder = PathTemplate("/test-with-header")
         ) {
             it.statusIsOk().responseJsonPath("$.header").equalsValue("test")
         }
@@ -72,7 +72,7 @@ class ControllerIntegrationTest {
 
     @Test
     fun `Get request with object response`() {
-        mockMvc.get(urlTemplate = UrlTemplate("/test-with-object")) {
+        mockMvc.get(pathBuilder = PathTemplate("/test-with-object")) {
             it.statusIsOk().responseJsonPath("$").equalsObject(TestObject())
         }
     }
@@ -82,7 +82,7 @@ class ControllerIntegrationTest {
         val restDocsIdentifier = "get-with-restdocs"
         mockMvc.get(
             docsIdentifier = restDocsIdentifier,
-            urlTemplate = UrlTemplate("/test")
+            pathBuilder = PathTemplate("/test")
         ) {
             it.statusIsOk().responseJsonPath("$.value").equalsValue("test")
         }

@@ -1,9 +1,6 @@
 package no.skatteetaten.aurora.mockmvc.extensions
 
-import com.github.tomakehurst.wiremock.client.MappingBuilder
-import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.matching
-import org.springframework.cloud.contract.wiremock.restdocs.ContractResultHandler
 import org.springframework.cloud.contract.wiremock.restdocs.WireMockRestDocs
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -24,69 +21,67 @@ fun HttpHeaders.header(key: String, value: String): HttpHeaders {
 fun MockMvc.get(
     headers: HttpHeaders? = null,
     docsIdentifier: String? = null,
-    urlTemplate: UrlTemplate,
+    pathBuilder: StubPathBuilder,
     fn: (mockMvcData: MockMvcData) -> Unit
-) = this.execute(HttpMethod.GET, headers, null, urlTemplate, fn, docsIdentifier)
+) = this.execute(HttpMethod.GET, headers, null, pathBuilder, fn, docsIdentifier)
 
 fun MockMvc.post(
     headers: HttpHeaders? = null,
     body: String? = null,
     docsIdentifier: String? = null,
-    urlTemplate: UrlTemplate,
+    pathBuilder: StubPathBuilder,
     fn: (mockMvcData: MockMvcData) -> Unit
-) = this.execute(HttpMethod.POST, headers, body, urlTemplate, fn, docsIdentifier)
+) = this.execute(HttpMethod.POST, headers, body, pathBuilder, fn, docsIdentifier)
 
 fun MockMvc.put(
     headers: HttpHeaders? = null,
     body: String? = null,
     docsIdentifier: String? = null,
-    urlTemplate: UrlTemplate,
+    pathBuilder: StubPathBuilder,
     fn: (mockMvcData: MockMvcData) -> Unit
-) = this.execute(HttpMethod.PUT, headers, body, urlTemplate, fn, docsIdentifier)
+) = this.execute(HttpMethod.PUT, headers, body, pathBuilder, fn, docsIdentifier)
 
 fun MockMvc.patch(
     headers: HttpHeaders? = null,
     body: String? = null,
     docsIdentifier: String? = null,
-    urlTemplate: UrlTemplate,
+    pathBuilder: StubPathBuilder,
     fn: (mockMvcData: MockMvcData) -> Unit
-) = this.execute(HttpMethod.PATCH, headers, body, urlTemplate, fn, docsIdentifier)
+) = this.execute(HttpMethod.PATCH, headers, body, pathBuilder, fn, docsIdentifier)
 
 fun MockMvc.delete(
     headers: HttpHeaders? = null,
     body: String? = null,
     docsIdentifier: String? = null,
-    urlTemplate: UrlTemplate,
+    pathBuilder: StubPathBuilder,
     fn: (mockMvcData: MockMvcData) -> Unit
-) = this.execute(HttpMethod.DELETE, headers, body, urlTemplate, fn, docsIdentifier)
+) = this.execute(HttpMethod.DELETE, headers, body, pathBuilder, fn, docsIdentifier)
 
 private fun MockMvc.execute(
     method: HttpMethod,
     headers: HttpHeaders?,
     body: String?,
-    urlTemplate: UrlTemplate,
+    pathBuilder: StubPathBuilder,
     fn: (mockMvcData: MockMvcData) -> Unit,
     docsIdentifier: String?
 ) {
-    val builder = MockMvcRequestBuilders.request(method, urlTemplate.urlString(), *urlTemplate.vars)
+    val builder = MockMvcRequestBuilders.request(method, pathBuilder.expandedUrl(), *pathBuilder.vars)
     headers?.let { builder.headers(it) }
     body?.let { builder.content(it) }
 
     val resultActions = this.perform(builder)
-    val mock = MockMvcData(urlTemplate.template, resultActions)
+    val mock = MockMvcData(pathBuilder, resultActions)
     fn(mock)
 
     headers?.keys?.forEach {
-        mock.andDo(WireMockRestDocs.verify().wiremock(mock.request(method).withHeader(it, matching(".+"))))
+        mock.andDo(
+            WireMockRestDocs.verify().wiremock(
+                mock.request(method).withHeader(it, matching(".+")).atPriority(pathBuilder.priority)
+            )
+        )
     }
 
     docsIdentifier?.let {
         mock.andDo(document(it))
     }
-}
-
-fun ContractResultHandler.get(mockMvcData: MockMvcData): MappingBuilder? {
-    val get = WireMock.get(mockMvcData.requestUrl)
-    this.wiremock(get)
-    return get
 }
