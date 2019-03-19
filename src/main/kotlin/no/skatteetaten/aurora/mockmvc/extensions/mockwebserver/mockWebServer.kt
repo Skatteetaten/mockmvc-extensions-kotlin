@@ -35,7 +35,7 @@ private fun MockWebServer.execute(fn: () -> Unit): RecordedRequest {
 }
 
 fun MockWebServer.execute(
-    status: Int,
+    status: Int = 200,
     response: Any,
     objectMapper: ObjectMapper = jacksonObjectMapper(),
     fn: () -> Unit
@@ -82,4 +82,4 @@ inline fun <reified T> RecordedRequest.bodyAsObject(path: String = "$"): T {
     return jacksonObjectMapper().convertValue(content)
 }
 
-fun RecordedRequest.bodyAsString() = this.body.readUtf8()
+fun RecordedRequest.bodyAsString(): String = this.body.readUtf8()

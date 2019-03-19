@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.getForEntity
+import org.springframework.web.client.postForEntity
 
 data class TestObject(val value: String)
 
@@ -35,27 +36,33 @@ class MockWebServerTest {
             assertThat(response).isOk()
             assertThat(response.body).isEqualTo("test")
         }
+
         assertThat(request).hasDefaultPath()
     }
 
     @Test
-    fun `Test execute with status and and response object`() {
+    fun `Test execute with status and response object`() {
         val request = server.execute(201, TestObject("test")) {
-            val response = RestTemplate().getForEntity<String>(url.toString())
+            val response = RestTemplate().postForEntity<String>(url.toString(), TestObject("test-request-body"))
             assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
             assertThat(response.body).isEqualTo("""{"value":"test"}""")
         }
+
         assertThat(request).hasDefaultPath()
+        assertThat(request.bodyAsString()).isEqualTo("""{"value":"test-request-body"}""")
     }
 
     @Test
-    fun `Test execute with response object`() {
+    fun `Test execute with request and response object`() {
         val request = server.execute(TestObject("test")) {
-            val response = RestTemplate().getForEntity<String>(url.toString())
+            val response = RestTemplate().postForEntity<String>(url.toString(), TestObject("test-request-body"))
             assertThat(response).isOk()
             assertThat(response.body).isEqualTo("""{"value":"test"}""")
         }
+        val body = request.bodyAsObject<TestObject>()
+
         assertThat(request).hasDefaultPath()
+        assertThat(body.value).isEqualTo("test-request-body")
     }
 
     @Test
@@ -68,6 +75,7 @@ class MockWebServerTest {
             assertThat(response1.body).isEqualTo("""{"value":"test"}""")
             assertThat(response2.body).isEqualTo("""{"value":"test"}""")
         }
+
         assertThat(requests.size).isEqualTo(2)
         assertThat(requests[0]).hasDefaultPath()
         assertThat(requests[1]).hasDefaultPath()
@@ -80,6 +88,7 @@ class MockWebServerTest {
             assertThat(response).isOk()
             assertThat(response.body).isEqualTo("""{"key":"test123"}""")
         }
+
         assertThat(request).hasDefaultPath()
     }
 
