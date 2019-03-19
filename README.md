@@ -8,15 +8,27 @@ For examples look at the [unit tests](https://github.com/Skatteetaten/mockmvc-ex
 
 ## Usage
 
+**GET request with `PathTemplate`**
 ```
 mockMvc.get(
   headers = HttpHeaders().authorization("test"),
   docsIdentifier = "my-docs",
-  pathTemplate = PathTemplate("/test/{id}", "123")
+  pathBuilder = PathTemplate("/test/{id}", "123")
 ) {
    it.statusIsOk().responseJsonPath("$.value").equalsValue("test")
 }
 ```
+
+**POST request with body**
+```
+mockMvc.post(
+  pathBuilder = ExactPath("/test"),
+  body = "test123"
+) {
+    it.statusIsOk().responseJsonPath("$.key").equalsValue("test123")
+}
+```
+
 
 | Name | Description | WireMock usage |
 |------|-------------|----------------|
