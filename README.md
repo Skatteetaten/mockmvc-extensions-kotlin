@@ -47,7 +47,7 @@ There are also convenience methods for asserting with JsonPath.
 
 To generate rest docs add `@AutoConfigureRestDocs` to your unit test class and include the `docsIdentifier`:
 ```
-mockMvc.get(docsIdentifier = "my-docs", pathTemplate = ExactPath("/test")) { ... }
+mockMvc.get(docsIdentifier = "my-docs", pathBuilder = ExactPath("/test")) { ... }
 ```
 
 This will by default generate the restdocs snippets in `<target/build>/generated-snippets/<docsIdentifier>/*.adoc`
