@@ -20,7 +20,7 @@ mockMvc.get(
 
 **Input**:
 
-| Name | Description | WireMock match |
+| Name | Description | WireMock usage |
 |------|-------------|----------------|
 | headers         | The HTTP headers used in the request                                | Check that the header is present, does not check the value |
 | body            | The request body, used for POST, PUT, PATCH and DELETE.             | Not used in the wiremock stub |
