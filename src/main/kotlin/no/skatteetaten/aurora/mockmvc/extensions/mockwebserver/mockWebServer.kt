@@ -34,16 +34,6 @@ private fun MockWebServer.execute(fn: () -> Unit): RecordedRequest {
     }
 }
 
-fun MockWebServer.execute(
-    status: Int = 200,
-    response: Any,
-    objectMapper: ObjectMapper = jacksonObjectMapper(),
-    fn: () -> Unit
-): RecordedRequest {
-    this.enqueueJson(status, response, objectMapper)
-    return this.execute(fn)
-}
-
 fun MockWebServer.execute(response: MockResponse, fn: () -> Unit): RecordedRequest {
     this.enqueue(response)
     return this.execute(fn)
@@ -57,11 +47,11 @@ fun MockWebServer.execute(
     return this.execute(fn)
 }
 
-fun MockWebServer.execute(vararg responses: Pair<Int, Any>, fn: () -> Unit): List<RecordedRequest> {
+fun MockWebServer.execute(vararg responses: Pair<Int, Any>, objectMapper: ObjectMapper = jacksonObjectMapper(), fn: () -> Unit): List<RecordedRequest> {
     fun takeRequests() = (1..responses.size).toList().map { this.takeRequest() }
 
     try {
-        responses.forEach { this.enqueueJson(status = it.first, body = it.second) }
+        responses.forEach { this.enqueueJson(status = it.first, body = it.second, objectMapper = objectMapper) }
         fn()
         return takeRequests()
     } catch (t: Throwable) {

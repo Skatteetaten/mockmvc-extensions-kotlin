@@ -5,6 +5,7 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.support.expected
 import assertk.catch
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
@@ -44,14 +45,14 @@ class MockWebServerTest {
 
     @Test
     fun `Test execute with status and response object`() {
-        val request = server.execute(201, TestObject("test")) {
+        val request = server.execute(201 to TestObject("test"), objectMapper = jacksonObjectMapper()) {
             val response = RestTemplate().postForEntity<String>(url.toString(), TestObject("test-request-body"))
             assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
             assertThat(response.body).isEqualTo("""{"value":"test"}""")
         }
 
-        assertThat(request).hasDefaultPath()
-        assertThat(request.bodyAsString()).isEqualTo("""{"value":"test-request-body"}""")
+        assertThat(request.first()).hasDefaultPath()
+        assertThat(request.first().bodyAsString()).isEqualTo("""{"value":"test-request-body"}""")
     }
 
     @Test
