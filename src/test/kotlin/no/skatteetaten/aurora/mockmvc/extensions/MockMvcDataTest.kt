@@ -2,14 +2,18 @@ package no.skatteetaten.aurora.mockmvc.extensions
 
 import assertk.assertThat
 import assertk.assertions.isFalse
+import assertk.assertions.isInstanceOf
+import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import assertk.assertions.matches
+import assertk.catch
 import io.mockk.mockk
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.http.HttpMethod
+import java.lang.IllegalArgumentException
 
 class MockMvcDataTest {
 
@@ -40,6 +44,14 @@ class MockMvcDataTest {
         val mappingBuilder = mockMvcData.request(method)
 
         assertThat(mappingBuilder.build().request.urlMatcher.isRegex).isFalse()
+    }
+
+    @Test
+    fun `Request WireMock builder for unsupported HTTP method`() {
+        val mockMvcData = MockMvcData(ExactPath("/test?key=value"), mockk())
+        val exception = catch { mockMvcData.request(HttpMethod.TRACE) }
+
+        assertThat(exception).isNotNull().isInstanceOf(IllegalArgumentException::class)
     }
 
     @Test
