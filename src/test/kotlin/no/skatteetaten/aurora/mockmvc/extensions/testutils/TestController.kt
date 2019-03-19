@@ -30,15 +30,16 @@ class TestController {
     fun getTestWithObject(): String = jacksonObjectMapper().writeValueAsString(TestObject())
 
     @PostMapping("/test")
-    fun postTest(@RequestBody value: String) = """{ "value": "test" }"""
+    fun postTest(@RequestBody value: String) = """{ "key": "$value" }"""
 
     @PutMapping("/test")
-    fun putTest(@RequestBody value: String) = """{ "value": "test" }"""
+    fun putTest(@RequestBody value: String) = """{ "key": "$value" }"""
 
     @PatchMapping("/test")
-    fun patchTest(@RequestBody value: String) = """{ "value": "test" }"""
+    fun patchTest(@RequestBody value: String) = """{ "key": "$value" }"""
 
     @DeleteMapping("/test")
     fun deleteTest(@RequestBody value: String) {
+        println("Delete body: $value")
     }
 }

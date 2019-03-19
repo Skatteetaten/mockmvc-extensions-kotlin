@@ -6,7 +6,7 @@
 
   <groupId>no.skatteetaten.aurora.mockmvc.extensions</groupId>
   <artifactId>mockmvc-extensions-kotlin</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>MockMvc extensions Kotlin</name>
@@ -187,6 +187,23 @@
           <nexusUrl>https://oss.sonatype.org/</nexusUrl>
           <autoReleaseAfterClose>true</autoReleaseAfterClose>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.3</version>
+        <configuration>
+          <destFile>${sonar.jacoco.reportPaths}</destFile>
+          <append>true</append>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>prepare-agent</goal>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
