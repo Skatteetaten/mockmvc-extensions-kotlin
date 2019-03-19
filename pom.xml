@@ -188,6 +188,23 @@
           <autoReleaseAfterClose>true</autoReleaseAfterClose>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.3</version>
+        <configuration>
+          <destFile>${sonar.jacoco.reportPaths}</destFile>
+          <append>true</append>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>prepare-agent</goal>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
