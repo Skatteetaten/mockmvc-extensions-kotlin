@@ -5,6 +5,7 @@ def config = [
         openShiftBuild: false,
         scriptVersion : 'v6',
         javaVersion : '8',
+        sonarQube: false,
         pipelineScript : 'https://git.aurora.skead.no/scm/ao/aurora-pipeline-scripts.git',
         versionStrategy : [
                 [branch: 'master', versionHint: '0']
