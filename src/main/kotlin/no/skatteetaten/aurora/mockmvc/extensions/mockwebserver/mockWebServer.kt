@@ -24,27 +24,17 @@ private fun MockWebServer.enqueueJson(
     this.enqueue(response)
 }
 
-private fun MockWebServer.execute(fn: () -> Unit): RecordedRequest {
+fun MockWebServer.execute(vararg responses: MockResponse, fn: () -> Unit): List<RecordedRequest> {
+    fun takeRequests() = (1..responses.size).toList().map { this.takeRequest() }
+
     try {
+        responses.forEach { this.enqueue(it)}
         fn()
-        return this.takeRequest()
+        return takeRequests()
     } catch (t: Throwable) {
-        this.takeRequest()
+        takeRequests()
         throw t
     }
-}
-
-fun MockWebServer.execute(response: MockResponse, fn: () -> Unit): RecordedRequest {
-    this.enqueue(response)
-    return this.execute(fn)
-}
-
-fun MockWebServer.execute(
-    response: Any,
-    fn: () -> Unit
-): RecordedRequest {
-    this.enqueueJson(body = response)
-    return this.execute(fn)
 }
 
 fun MockWebServer.execute(vararg responses: Pair<Int, Any>, objectMapper: ObjectMapper = jacksonObjectMapper(), fn: () -> Unit): List<RecordedRequest> {

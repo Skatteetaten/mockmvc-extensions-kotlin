@@ -33,14 +33,22 @@ class MockWebServerTest {
     }
 
     @Test
-    fun `Test execute with MockResponse`() {
-        val request = server.execute(MockResponse().setBody("test")) {
-            val response = RestTemplate().getForEntity<String>(url.toString())
-            assertThat(response).isOk()
-            assertThat(response.body).isEqualTo("test")
+    fun `Test execute with MockResponses`() {
+        val mockResponse = MockResponse().setBody("test")
+
+        val request = server.execute(mockResponse, mockResponse) {
+            val response1 = RestTemplate().getForEntity<String>(url.toString())
+            val response2 = RestTemplate().getForEntity<String>(url.toString())
+
+            assertThat(response1).isOk()
+            assertThat(response1.body).isEqualTo("test")
+            assertThat(response2).isOk()
+            assertThat(response2.body).isEqualTo("test")
         }
 
-        assertThat(request).hasDefaultPath()
+        assertThat(request.size).isEqualTo(2)
+        assertThat(request.first()).hasDefaultPath()
+        assertThat(request[1]).hasDefaultPath()
     }
 
     @Test
@@ -62,9 +70,9 @@ class MockWebServerTest {
             assertThat(response).isOk()
             assertThat(response.body).isEqualTo("""{"value":"test"}""")
         }
-        val body = request.bodyAsObject<TestObject>()
+        val body = request.first().bodyAsObject<TestObject>()
 
-        assertThat(request).hasDefaultPath()
+        assertThat(request.first()).hasDefaultPath()
         assertThat(body.value).isEqualTo("test-request-body")
     }
 
@@ -109,7 +117,7 @@ class MockWebServerTest {
             assertThat(response.body).isEqualTo("""{"key":"test123"}""")
         }
 
-        assertThat(request).hasDefaultPath()
+        assertThat(request.first()).hasDefaultPath()
     }
 
     private fun Assert<ResponseEntity<*>>.isOk() = given { request ->
