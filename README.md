@@ -18,8 +18,6 @@ mockMvc.get(
 }
 ```
 
-**Input**:
-
 | Name | Description | WireMock usage |
 |------|-------------|----------------|
 | headers         | The HTTP headers used in the request                                | Check that the header is present, does not check the value |
