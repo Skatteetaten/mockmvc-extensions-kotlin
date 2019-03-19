@@ -4,7 +4,7 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>no.skatteetaten.aurora.mockmvc.extensions</groupId>
+  <groupId>no.skatteetaten.aurora</groupId>
   <artifactId>mockmvc-extensions-kotlin</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
