@@ -4,6 +4,7 @@ import assertk.Assert
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.support.expected
+import assertk.catch
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.getForEntity
 import org.springframework.web.client.postForEntity
@@ -74,6 +76,23 @@ class MockWebServerTest {
             assertThat(response2).isOk()
             assertThat(response1.body).isEqualTo("""{"value":"test"}""")
             assertThat(response2.body).isEqualTo("""{"value":"test"}""")
+        }
+
+        assertThat(requests.size).isEqualTo(2)
+        assertThat(requests[0]).hasDefaultPath()
+        assertThat(requests[1]).hasDefaultPath()
+    }
+
+    @Test
+    fun `Test execute with vararg response pairs`() {
+        val requests = server.execute(200 to TestObject("test"), 404 to TestObject("test")) {
+            val response1 = RestTemplate().getForEntity<String>(url.toString())
+            val exception: HttpClientErrorException =
+                catch { RestTemplate().getForEntity<String>(url.toString()) } as HttpClientErrorException
+            assertThat(response1).isOk()
+            assertThat(exception.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
+            assertThat(response1.body).isEqualTo("""{"value":"test"}""")
+            assertThat(exception.responseBodyAsString).isEqualTo("""{"value":"test"}""")
         }
 
         assertThat(requests.size).isEqualTo(2)
