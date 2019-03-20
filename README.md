@@ -57,11 +57,17 @@ This will by default generate the restdocs snippets in `<target/build>/generated
 In contract tests it is often useful to store the responses in json files, this will ensure that changes to the returned object still works with the existing contract values.
 This library provides a `willReturnContractResponse` function that makes it easy to setup the mocks with data from the json files.
 
-In the example below we mock the `get()` function to return the object populated with the values from the json file `contracts/test-response.json`.
+In the example below we mock the `getTestObject()` function to return the object populated with the values from the json file `contracts/test-response.json`.
 
 ```
-given(mock.get()).willReturnContractResponse("test-response")
+given(mock.getTestObject()).willReturnContractResponse("test-response")
 ```
+
+It is possible to get the object created from the json file
+```
+val content = given(mock.getTestObject()).willReturnContractResponse("test-response").content
+```
+
 
 ## WireMock
 
