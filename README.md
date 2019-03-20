@@ -63,9 +63,9 @@ In the example below we mock the `getTestObject()` function to return the object
 given(mock.getTestObject()).willReturnContractResponse("test-response")
 ```
 
-It is possible to get the object created from the json file
+It is also possible to get the object created from the json file
 ```
-val content = given(mock.getTestObject()).willReturnContractResponse("test-response").content
+val testObject = given(mock.getTestObject()).willReturnContractResponse("test-response").content
 ```
 
 
