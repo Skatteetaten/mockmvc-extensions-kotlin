@@ -1,15 +1,20 @@
 package no.skatteetaten.aurora.mockmvc.extensions
 
-import com.github.tomakehurst.wiremock.client.WireMock.matching
-import org.springframework.cloud.contract.wiremock.restdocs.WireMockRestDocs
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
+import org.springframework.http.MediaType
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 
 fun HttpHeaders.authorization(value: String): HttpHeaders {
     this.set(HttpHeaders.AUTHORIZATION, value)
+    return this
+}
+
+fun HttpHeaders.contentType(contentType: String = MediaType.APPLICATION_JSON_VALUE): HttpHeaders {
+    this.set(HttpHeaders.CONTENT_TYPE, contentType)
     return this
 }
 
@@ -21,65 +26,67 @@ fun HttpHeaders.header(key: String, value: String): HttpHeaders {
 fun MockMvc.get(
     headers: HttpHeaders? = null,
     docsIdentifier: String? = null,
-    pathBuilder: StubPathBuilder,
+    path: Path,
     fn: (mockMvcData: MockMvcData) -> Unit
-) = this.execute(HttpMethod.GET, headers, null, pathBuilder, fn, docsIdentifier)
+) = this.execute(HttpMethod.GET, headers, null, path, fn, docsIdentifier)
 
 fun MockMvc.post(
     headers: HttpHeaders? = null,
-    body: String? = null,
+    body: Any? = null,
     docsIdentifier: String? = null,
-    pathBuilder: StubPathBuilder,
+    path: Path,
     fn: (mockMvcData: MockMvcData) -> Unit
-) = this.execute(HttpMethod.POST, headers, body, pathBuilder, fn, docsIdentifier)
+) = this.execute(HttpMethod.POST, headers, body, path, fn, docsIdentifier)
 
 fun MockMvc.put(
     headers: HttpHeaders? = null,
-    body: String? = null,
+    body: Any? = null,
     docsIdentifier: String? = null,
-    pathBuilder: StubPathBuilder,
+    path: Path,
     fn: (mockMvcData: MockMvcData) -> Unit
-) = this.execute(HttpMethod.PUT, headers, body, pathBuilder, fn, docsIdentifier)
+) = this.execute(HttpMethod.PUT, headers, body, path, fn, docsIdentifier)
 
 fun MockMvc.patch(
     headers: HttpHeaders? = null,
-    body: String? = null,
+    body: Any? = null,
     docsIdentifier: String? = null,
-    pathBuilder: StubPathBuilder,
+    path: Path,
     fn: (mockMvcData: MockMvcData) -> Unit
-) = this.execute(HttpMethod.PATCH, headers, body, pathBuilder, fn, docsIdentifier)
+) = this.execute(HttpMethod.PATCH, headers, body, path, fn, docsIdentifier)
 
 fun MockMvc.delete(
     headers: HttpHeaders? = null,
-    body: String? = null,
+    body: Any? = null,
     docsIdentifier: String? = null,
-    pathBuilder: StubPathBuilder,
+    path: Path,
     fn: (mockMvcData: MockMvcData) -> Unit
-) = this.execute(HttpMethod.DELETE, headers, body, pathBuilder, fn, docsIdentifier)
+) = this.execute(HttpMethod.DELETE, headers, body, path, fn, docsIdentifier)
 
 private fun MockMvc.execute(
     method: HttpMethod,
     headers: HttpHeaders?,
-    body: String?,
-    pathBuilder: StubPathBuilder,
+    body: Any?,
+    path: Path,
     fn: (mockMvcData: MockMvcData) -> Unit,
     docsIdentifier: String?
 ) {
-    val builder = MockMvcRequestBuilders.request(method, pathBuilder.expandedUrl(), *pathBuilder.vars)
+    val builder = MockMvcRequestBuilders.request(method, path.url, *path.vars)
     headers?.let { builder.headers(it) }
-    body?.let { builder.content(it) }
+    body?.let {
+        val jsonString = if (it is String) {
+            it
+        } else {
+            jacksonObjectMapper().writeValueAsString(it)
+        }
+
+        builder.content(jsonString)
+    }
 
     val resultActions = this.perform(builder)
-    val mock = MockMvcData(pathBuilder, resultActions)
+    val mock = MockMvcData(path, resultActions)
     fn(mock)
 
-    headers?.keys?.forEach {
-        mock.andDo(
-            WireMockRestDocs.verify().wiremock(
-                mock.request(method).withHeader(it, matching(".+")).atPriority(pathBuilder.priority)
-            )
-        )
-    }
+    mock.andDo(mock.setupWireMock(headers, method))
 
     docsIdentifier?.let {
         mock.andDo(document(it))

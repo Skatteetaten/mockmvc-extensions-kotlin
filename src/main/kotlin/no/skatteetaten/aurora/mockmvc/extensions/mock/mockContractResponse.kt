@@ -10,8 +10,11 @@ inline fun <reified T : Any> BDDMockito.BDDMyOngoingStubbing<T?>.willReturnContr
     folder: String = "contracts",
     extension: String = "json",
     objectMapper: ObjectMapper = jacksonObjectMapper()
-): BDDMockito.BDDMyOngoingStubbing<T?>? {
+): ExtendedBDDMyOngoingStubbing<T?> {
     val fileName = "/$folder/$name.$extension"
     val content = objectMapper.readValue<T?>(this::class.java.getResource(fileName))
-    return this.willReturn(content)
+    return ExtendedBDDMyOngoingStubbing(this.willReturn(content), content)
 }
+
+class ExtendedBDDMyOngoingStubbing<T>(ongoingStubbing: BDDMockito.BDDMyOngoingStubbing<T>, val content: T?) :
+    BDDMockito.BDDMyOngoingStubbing<T> by ongoingStubbing

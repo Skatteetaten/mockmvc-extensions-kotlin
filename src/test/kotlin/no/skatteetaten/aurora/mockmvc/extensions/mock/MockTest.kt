@@ -8,7 +8,7 @@ import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.mock
 
 open class MockMe {
-    open fun get() = TestObject()
+    open fun getTestObject() = TestObject()
 }
 
 class MockTest {
@@ -16,11 +16,10 @@ class MockTest {
     @Test
     fun `Return object from json file in mock`() {
         val mock = mock(MockMe::class.java)
-        given(mock.get()).willReturnContractResponse("test-response")
+        val mockedContent = given(mock.getTestObject()).willReturnContractResponse("test-response").content
 
-        val testObject = mock.get()
+        val testObject = mock.getTestObject()
 
-        assertThat(testObject.value1).isEqualTo("test123")
-        assertThat(testObject.value2).isEqualTo("abc123")
+        assertThat(testObject).isEqualTo(mockedContent)
     }
 }

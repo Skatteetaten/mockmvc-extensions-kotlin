@@ -5,15 +5,15 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.matching.AnythingPattern
 import com.github.tomakehurst.wiremock.matching.RegexPattern
 import com.github.tomakehurst.wiremock.matching.UrlPattern
+import org.springframework.cloud.contract.wiremock.restdocs.WireMockRestDocs
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.test.web.servlet.ResultActions
-import org.springframework.web.util.UriComponentsBuilder
+import org.springframework.test.web.servlet.ResultHandler
 
-data class MockMvcData(val pathBuilder: StubPathBuilder, val results: ResultActions) : ResultActions by results {
+data class MockMvcData(val path: Path, val results: ResultActions) : ResultActions by results {
     private val containsPlaceholder = Regex(pattern = "\\{.+?}")
-    private val requestUrl = pathBuilder.url
-
-    fun get(): MappingBuilder = getWireMockUrl()?.let { WireMock.get(it) } ?: WireMock.get(requestUrl)
+    private val requestUrl = path.url
 
     fun request(method: HttpMethod): MappingBuilder =
         when (method) {
@@ -38,26 +38,20 @@ data class MockMvcData(val pathBuilder: StubPathBuilder, val results: ResultActi
         } else {
             null
         }
+
+    fun setupWireMock(headers: HttpHeaders?, method: HttpMethod): ResultHandler {
+        val mappingBuilder = this.request(method)
+
+        headers?.keys?.forEach {
+            mappingBuilder.withHeader(it, WireMock.matching(".+"))
+        }
+        return WireMockRestDocs.verify().wiremock(mappingBuilder.atPriority(path.priority))
+    }
 }
 
-interface StubPathBuilder {
-    val url: String
-    val vars: Array<out String>
-        get() = emptyArray()
-
-    val priority: Int
-    fun expandedUrl(): String
-}
-
-class ExactPath(override val url: String, override val priority: Int = 1) : StubPathBuilder {
-    override fun expandedUrl() = url
-}
-
-class PathTemplate(
-    override val url: String,
-    override vararg val vars: String,
-    override val priority: Int = 2
-) : StubPathBuilder {
-    override fun expandedUrl() =
-        UriComponentsBuilder.fromUriString(url).buildAndExpand(*vars).encode().toUri().toString()
+class Path(
+    val url: String,
+    vararg val vars: String
+) {
+    val priority = if (vars.isEmpty()) 1 else 2
 }

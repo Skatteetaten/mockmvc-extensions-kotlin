@@ -14,8 +14,10 @@ import org.springframework.http.HttpHeaders
 import org.springframework.restdocs.RestDocumentationExtension
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.web.servlet.config.annotation.EnableWebMvc
 import java.io.File
 
+@EnableWebMvc
 @ExtendWith(SpringExtension::class, RestDocumentationExtension::class)
 @SpringBootTest(classes = [TestController::class])
 @AutoConfigureMockMvc
@@ -27,35 +29,46 @@ class ControllerIntegrationTest {
 
     @Test
     fun `Get request with json response`() {
-        mockMvc.get(pathBuilder = PathTemplate("/{test-path}", "test")) {
+        mockMvc.get(path = Path("/{test-path}", "test")) {
             it.statusIsOk().responseJsonPath("$.value").equalsValue("test")
         }
     }
 
     @Test
     fun `Post request with json response`() {
-        mockMvc.post(pathBuilder = ExactPath("/test"), body = "test123") {
+        mockMvc.post(path = Path("/test"), body = "test123") {
             it.statusIsOk().responseJsonPath("$.key").equalsValue("test123")
         }
     }
 
     @Test
+    fun `Post request with request object`() {
+        mockMvc.post(
+            path = Path("/test-with-request-object"),
+            headers = HttpHeaders().contentType(),
+            body = TestObject()
+        ) {
+            it.statusIsOk().responseJsonPath("$.key").equalsValue("123")
+        }
+    }
+
+    @Test
     fun `Put request with json response`() {
-        mockMvc.put(pathBuilder = ExactPath("/test"), body = "test123") {
+        mockMvc.put(path = Path("/test"), body = "test123") {
             it.statusIsOk().responseJsonPath("$.key").equalsValue("test123")
         }
     }
 
     @Test
     fun `Patch request with json response`() {
-        mockMvc.patch(pathBuilder = ExactPath("/test"), body = "test123") {
+        mockMvc.patch(path = Path("/test"), body = "test123") {
             it.statusIsOk().responseJsonPath("$.key").equalsValue("test123")
         }
     }
 
     @Test
     fun `Delete request with json response`() {
-        mockMvc.delete(pathBuilder = ExactPath("/test"), body = "test123") {
+        mockMvc.delete(path = Path("/test"), body = "test123") {
             it.statusIsOk()
         }
     }
@@ -64,7 +77,7 @@ class ControllerIntegrationTest {
     fun `Get request with headers`() {
         mockMvc.get(
             headers = HttpHeaders().authorization("test").header("x-my-custom-header", "abc123"),
-            pathBuilder = PathTemplate("/{test-path}", "test-with-header")
+            path = Path("/{test-path}", "test-with-header")
         ) {
             it.statusIsOk().responseJsonPath("$.header").equalsValue("test")
         }
@@ -72,7 +85,7 @@ class ControllerIntegrationTest {
 
     @Test
     fun `Get request with object response`() {
-        mockMvc.get(pathBuilder = ExactPath("/test-with-object")) {
+        mockMvc.get(path = Path("/test-with-object")) {
             it.statusIsOk().responseJsonPath("$").equalsObject(TestObject())
         }
     }
@@ -82,7 +95,7 @@ class ControllerIntegrationTest {
         val restDocsIdentifier = "get-with-restdocs"
         mockMvc.get(
             docsIdentifier = restDocsIdentifier,
-            pathBuilder = ExactPath("/test")
+            path = Path("/test")
         ) {
             it.statusIsOk().responseJsonPath("$.value").equalsValue("test")
         }
