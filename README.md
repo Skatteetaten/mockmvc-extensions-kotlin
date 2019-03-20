@@ -19,7 +19,7 @@ mockMvc.get(
 }
 ```
 
-**POST request with body**
+**POST request with `body`**
 ```
 mockMvc.post(
   pathBuilder = ExactPath("/test"),
