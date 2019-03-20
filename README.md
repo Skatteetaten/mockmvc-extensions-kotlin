@@ -52,6 +52,17 @@ mockMvc.get(docsIdentifier = "my-docs", pathBuilder = ExactPath("/test")) { ... 
 
 This will by default generate the restdocs snippets in `<target/build>/generated-snippets/<docsIdentifier>/*.adoc`
 
+## JSON responses
+
+In contract tests it is often useful to store the responses in json files, this will ensure that changes to the returned object still works with the existing contract values.
+This library provides a `willReturnContractResponse` function that makes it easy to setup the mocks with data from the json files.
+
+In the example below we mock the `get()` function to return the object populated with the values from the json file `contracts/test-response.json`.
+
+```
+given(mock.get()).willReturnContractResponse("test-response")
+```
+
 ## WireMock
 
 For information on how to setup the contract consumer see the [Spring Cloud Contract documentation](https://cloud.spring.io/spring-cloud-contract/spring-cloud-contract.html#_client_side)
@@ -60,3 +71,5 @@ For information on how to setup the contract consumer see the [Spring Cloud Cont
 
 The build script must package the stub-jar file,
 for more details take a look at [this sample from Spring Cloud Contract](https://github.com/spring-cloud-samples/spring-cloud-contract-samples/blob/master/producer_with_restdocs/build.gradle#L83)
+
+
