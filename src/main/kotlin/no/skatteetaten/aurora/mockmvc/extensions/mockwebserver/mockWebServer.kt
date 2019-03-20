@@ -28,7 +28,7 @@ fun MockWebServer.execute(vararg responses: MockResponse, fn: () -> Unit): List<
     fun takeRequests() = (1..responses.size).toList().map { this.takeRequest() }
 
     try {
-        responses.forEach { this.enqueue(it)}
+        responses.forEach { this.enqueue(it) }
         fn()
         return takeRequests()
     } catch (t: Throwable) {
@@ -37,7 +37,11 @@ fun MockWebServer.execute(vararg responses: MockResponse, fn: () -> Unit): List<
     }
 }
 
-fun MockWebServer.execute(vararg responses: Pair<Int, Any>, objectMapper: ObjectMapper = jacksonObjectMapper(), fn: () -> Unit): List<RecordedRequest> {
+fun MockWebServer.execute(
+    vararg responses: Pair<Int, Any>,
+    objectMapper: ObjectMapper = jacksonObjectMapper(),
+    fn: () -> Unit
+): List<RecordedRequest> {
     fun takeRequests() = (1..responses.size).toList().map { this.takeRequest() }
 
     try {

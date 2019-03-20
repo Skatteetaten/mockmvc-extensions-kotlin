@@ -9,9 +9,9 @@ import org.springframework.http.HttpMethod
 import org.springframework.test.web.servlet.ResultActions
 import org.springframework.web.util.UriComponentsBuilder
 
-data class MockMvcData(val pathBuilder: StubPathBuilder, val results: ResultActions) : ResultActions by results {
+data class MockMvcData(val path: Path, val results: ResultActions) : ResultActions by results {
     private val containsPlaceholder = Regex(pattern = "\\{.+?}")
-    private val requestUrl = pathBuilder.url
+    private val requestUrl = path.url
 
     fun get(): MappingBuilder = getWireMockUrl()?.let { WireMock.get(it) } ?: WireMock.get(requestUrl)
 
@@ -40,24 +40,16 @@ data class MockMvcData(val pathBuilder: StubPathBuilder, val results: ResultActi
         }
 }
 
-interface StubPathBuilder {
-    val url: String
-    val vars: Array<out String>
-        get() = emptyArray()
+class Path(
+    val url: String,
+    vararg val vars: String
+) {
+    val priority = if (vars.isEmpty()) 1 else 2
 
-    val priority: Int
-    fun expandedUrl(): String
-}
-
-class ExactPath(override val url: String, override val priority: Int = 1) : StubPathBuilder {
-    override fun expandedUrl() = url
-}
-
-class PathTemplate(
-    override val url: String,
-    override vararg val vars: String,
-    override val priority: Int = 2
-) : StubPathBuilder {
-    override fun expandedUrl() =
-        UriComponentsBuilder.fromUriString(url).buildAndExpand(*vars).encode().toUri().toString()
+    fun expandedUrl() =
+        if (vars.isEmpty()) {
+            url
+        } else {
+            UriComponentsBuilder.fromUriString(url).buildAndExpand(*vars).encode().toUri().toString()
+        }
 }

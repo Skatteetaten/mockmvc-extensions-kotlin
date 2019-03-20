@@ -2,7 +2,6 @@ package no.skatteetaten.aurora.mockmvc.extensions.testutils
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -10,13 +9,11 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
-import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 data class TestObject(val value1: String = "123", val value2: String = "abc")
 
 @RestController
-@RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 class TestController {
 
     @GetMapping("/test")
@@ -31,6 +28,9 @@ class TestController {
 
     @PostMapping("/test")
     fun postTest(@RequestBody value: String) = """{ "key": "$value" }"""
+
+    @PostMapping("/test-with-request-object")
+    fun postTest(@RequestBody testObject: TestObject) = """{ "key": "${testObject.value1}" }"""
 
     @PutMapping("/test")
     fun putTest(@RequestBody value: String) = """{ "key": "$value" }"""

@@ -19,8 +19,8 @@ class MockMvcDataTest {
 
     @Test
     fun `Get WireMock url containing url placeholders`() {
-        val template = PathTemplate("/test/{test1}/testing/{test2}?key=value", "a", "b", priority = 2)
-        val mockMvcData = MockMvcData(template, mockk())
+        val path = Path("/test/{test1}/testing/{test2}?key=value", "a", "b")
+        val mockMvcData = MockMvcData(path, mockk())
         val urlPattern = mockMvcData.getWireMockUrl()
 
         val regex = urlPattern?.pattern?.value ?: ""
@@ -30,8 +30,8 @@ class MockMvcDataTest {
     @ParameterizedTest
     @EnumSource(value = HttpMethod::class, mode = EnumSource.Mode.EXCLUDE, names = ["HEAD", "OPTIONS", "TRACE"])
     fun `Request WireMock builder for HTTP method containing placeholder`(method: HttpMethod) {
-        val template = PathTemplate("/test/{test1}?key=value", "a")
-        val mockMvcData = MockMvcData(template, mockk())
+        val path = Path("/test/{test1}?key=value", "a")
+        val mockMvcData = MockMvcData(path, mockk())
         val mappingBuilder = mockMvcData.request(method)
 
         assertThat(mappingBuilder.build().request.urlMatcher.isRegex).isTrue()
@@ -40,7 +40,7 @@ class MockMvcDataTest {
     @ParameterizedTest
     @EnumSource(value = HttpMethod::class, mode = EnumSource.Mode.EXCLUDE, names = ["HEAD", "OPTIONS", "TRACE"])
     fun `Request WireMock builder for HTTP method`(method: HttpMethod) {
-        val mockMvcData = MockMvcData(ExactPath("/test?key=value"), mockk())
+        val mockMvcData = MockMvcData(Path("/test?key=value"), mockk())
         val mappingBuilder = mockMvcData.request(method)
 
         assertThat(mappingBuilder.build().request.urlMatcher.isRegex).isFalse()
@@ -48,7 +48,7 @@ class MockMvcDataTest {
 
     @Test
     fun `Request WireMock builder for unsupported HTTP method`() {
-        val mockMvcData = MockMvcData(ExactPath("/test?key=value"), mockk())
+        val mockMvcData = MockMvcData(Path("/test?key=value"), mockk())
         val exception = catch { mockMvcData.request(HttpMethod.TRACE) }
 
         assertThat(exception).isNotNull().isInstanceOf(IllegalArgumentException::class)
@@ -56,7 +56,7 @@ class MockMvcDataTest {
 
     @Test
     fun `Get WireMock url not containing url placeholders`() {
-        val mockMvcData = MockMvcData(ExactPath("/test/testing"), mockk())
+        val mockMvcData = MockMvcData(Path("/test/testing"), mockk())
         val urlPattern = mockMvcData.getWireMockUrl()
 
         assertThat(urlPattern).isNull()
