@@ -8,7 +8,7 @@ For examples look at the [unit tests](https://github.com/Skatteetaten/mockmvc-ex
 
 ## Usage
 
-**GET request with `Path`**
+**GET request**
 ```
 mockMvc.get(
   headers = HttpHeaders().authorization("test"),
