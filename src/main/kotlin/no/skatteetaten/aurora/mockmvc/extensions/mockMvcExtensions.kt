@@ -1,8 +1,6 @@
 package no.skatteetaten.aurora.mockmvc.extensions
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.github.tomakehurst.wiremock.client.WireMock.matching
-import org.springframework.cloud.contract.wiremock.restdocs.WireMockRestDocs
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
@@ -72,7 +70,7 @@ private fun MockMvc.execute(
     fn: (mockMvcData: MockMvcData) -> Unit,
     docsIdentifier: String?
 ) {
-    val builder = MockMvcRequestBuilders.request(method, path.expandedUrl(), *path.vars)
+    val builder = MockMvcRequestBuilders.request(method, path.url, *path.vars)
     headers?.let { builder.headers(it) }
     body?.let {
         val jsonString = if (it is String) {
@@ -88,15 +86,7 @@ private fun MockMvc.execute(
     val mock = MockMvcData(path, resultActions)
     fn(mock)
 
-    val mappingBuilder = mock.request(method)
-    headers?.keys?.forEach {
-        mappingBuilder.withHeader(it, matching(".+"))
-    }
-    mock.andDo(
-        WireMockRestDocs.verify().wiremock(
-            mappingBuilder.atPriority(path.priority)
-        )
-    )
+    mock.andDo(mock.setupWireMock(headers, method))
 
     docsIdentifier?.let {
         mock.andDo(document(it))
