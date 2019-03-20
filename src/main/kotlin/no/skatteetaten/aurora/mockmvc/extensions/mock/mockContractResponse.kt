@@ -8,9 +8,10 @@ import org.mockito.BDDMockito
 inline fun <reified T : Any> BDDMockito.BDDMyOngoingStubbing<T?>.willReturnContractResponse(
     name: String,
     folder: String = "contracts",
+    extension: String = "json",
     objectMapper: ObjectMapper = jacksonObjectMapper()
 ): BDDMockito.BDDMyOngoingStubbing<T?>? {
-    val fileName = "/$folder/$name.json"
+    val fileName = "/$folder/$name.$extension"
     val content = objectMapper.readValue<T?>(this::class.java.getResource(fileName))
     return this.willReturn(content)
 }
