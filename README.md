@@ -52,7 +52,7 @@ mockMvc.get(docsIdentifier = "my-docs", pathBuilder = ExactPath("/test")) { ... 
 
 This will by default generate the restdocs snippets in `<target/build>/generated-snippets/<docsIdentifier>/*.adoc`
 
-## JSON responses
+## Mock responses
 
 In contract tests it is often useful to store the responses in json files, this will ensure that changes to the returned object still works with the existing contract values.
 This library provides a `willReturnContractResponse` function that makes it easy to setup the mocks with data from the json files.
