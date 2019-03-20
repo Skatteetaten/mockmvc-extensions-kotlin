@@ -88,13 +88,15 @@ private fun MockMvc.execute(
     val mock = MockMvcData(path, resultActions)
     fn(mock)
 
+    val mappingBuilder = mock.request(method)
     headers?.keys?.forEach {
-        mock.andDo(
-            WireMockRestDocs.verify().wiremock(
-                mock.request(method).withHeader(it, matching(".+")).atPriority(path.priority)
-            )
-        )
+        mappingBuilder.withHeader(it, matching(".+"))
     }
+    mock.andDo(
+        WireMockRestDocs.verify().wiremock(
+            mappingBuilder.atPriority(path.priority)
+        )
+    )
 
     docsIdentifier?.let {
         mock.andDo(document(it))
