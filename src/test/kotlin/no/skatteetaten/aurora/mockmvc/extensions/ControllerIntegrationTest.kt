@@ -46,9 +46,11 @@ class ControllerIntegrationTest {
         mockMvc.post(
             path = Path("/test-with-request-object"),
             headers = HttpHeaders().contentType(),
-            body = TestObject()
+            body = TestObject(value1 = "123", value2 = "", success = false)
         ) {
-            it.statusIsOk().responseJsonPath("$.key").equalsValue("123")
+            it.statusIsOk().responseJsonPath("$.key1").equalsValue("123")
+                .responseJsonPath("$.key2").isEmpty()
+                .responseJsonPath("$.success").isFalse()
         }
     }
 
@@ -86,7 +88,8 @@ class ControllerIntegrationTest {
     @Test
     fun `Get request with object response`() {
         mockMvc.get(path = Path("/test-with-object")) {
-            it.statusIsOk().responseJsonPath("$").equalsObject(TestObject())
+            it.statusIsOk().responseJsonPath("$").equalsObject(TestObject()).responseJsonPath("$.success").isTrue()
+                .responseJsonPath("$.value1").isNotEmpty()
         }
     }
 

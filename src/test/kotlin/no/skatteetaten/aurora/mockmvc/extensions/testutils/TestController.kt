@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RestController
 
-data class TestObject(val value1: String = "123", val value2: String = "abc")
+data class TestObject(val value1: String = "123", val value2: String = "abc", val success: Boolean = true)
 
 @RestController
 class TestController {
@@ -30,7 +30,8 @@ class TestController {
     fun postTest(@RequestBody value: String) = """{ "key": "$value" }"""
 
     @PostMapping("/test-with-request-object")
-    fun postTest(@RequestBody testObject: TestObject) = """{ "key": "${testObject.value1}" }"""
+    fun postTest(@RequestBody testObject: TestObject) =
+        """{ "key1": "${testObject.value1}", "success": ${testObject.success}, "key2":"${testObject.value2}"}"""
 
     @PutMapping("/test")
     fun putTest(@RequestBody value: String) = """{ "key": "$value" }"""

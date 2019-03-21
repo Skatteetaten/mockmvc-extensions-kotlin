@@ -8,17 +8,18 @@ import org.hamcrest.Matchers
 import org.junit.jupiter.api.Assertions
 import org.springframework.http.HttpStatus
 import org.springframework.test.web.servlet.ResultActions
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 fun ResultActions.status(expected: HttpStatus): ResultActions =
-    this.andExpect(MockMvcResultMatchers.status().`is`(expected.value()))
+    this.andExpect(status().`is`(expected.value()))
 
 fun ResultActions.statusIsOk(): ResultActions =
-    this.andExpect(MockMvcResultMatchers.status().`is`(HttpStatus.OK.value()))
+    this.andExpect(status().`is`(HttpStatus.OK.value()))
 
 data class JsonPathEquals(val expression: String, val resultActions: ResultActions) {
     fun equalsValue(value: Any): ResultActions {
-        resultActions.andExpect(MockMvcResultMatchers.jsonPath(expression, Matchers.equalTo(value)))
+        resultActions.andExpect(jsonPath(expression, Matchers.equalTo(value)))
         return resultActions
     }
 
@@ -30,6 +31,11 @@ data class JsonPathEquals(val expression: String, val resultActions: ResultActio
         }
         return resultActions
     }
+
+    fun isEmpty(): ResultActions = resultActions.andExpect(jsonPath(expression).isEmpty)
+    fun isNotEmpty(): ResultActions = resultActions.andExpect(jsonPath(expression).isNotEmpty)
+    fun isTrue(): ResultActions = resultActions.andExpect(jsonPath(expression).value(true))
+    fun isFalse(): ResultActions = resultActions.andExpect(jsonPath(expression).value(false))
 }
 
 fun ResultActions.responseJsonPath(jsonPath: String) = JsonPathEquals(jsonPath, this)

@@ -20,7 +20,7 @@ inline fun <reified T : Any> BDDMockito.BDDMyOngoingStubbing<T>.withContractResp
     return ExtendedBDDMyOngoingStubbing(onGoingStubbing, content)
 }
 
-class ExtendedBDDMyOngoingStubbing<T>(ongoingStubbing: BDDMockito.BDDMyOngoingStubbing<T>, val content: T?) :
+class ExtendedBDDMyOngoingStubbing<T>(ongoingStubbing: BDDMockito.BDDMyOngoingStubbing<T>, val content: T) :
     BDDMockito.BDDMyOngoingStubbing<T> by ongoingStubbing {
     val mockResponse = content
 }
