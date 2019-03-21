@@ -15,7 +15,7 @@ fun ResultActions.status(expected: HttpStatus): ResultActions =
     this.andExpect(status().`is`(expected.value()))
 
 fun ResultActions.statusIsOk(): ResultActions =
-    this.andExpect(status().`is`(HttpStatus.OK.value()))
+    this.andExpect(status().isOk)
 
 data class JsonPathEquals(val expression: String, val resultActions: ResultActions) {
     fun equalsValue(value: Any): ResultActions {

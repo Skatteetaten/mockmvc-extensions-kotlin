@@ -4,8 +4,8 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 
 fun HttpHeaders.authorization(value: String): HttpHeaders {
@@ -70,8 +70,25 @@ private fun MockMvc.execute(
     fn: (mockMvcData: MockMvcData) -> Unit,
     docsIdentifier: String?
 ) {
-    val builder = MockMvcRequestBuilders.request(method, path.url, *path.vars)
-    headers?.let { builder.headers(it) }
+    val builder = MockMvcRequestBuilders
+        .request(method, path.url, *path.vars)
+        .addHeaders(headers)
+        .addBody(body)
+
+    val resultActions = this.perform(builder)
+    val mock = MockMvcData(path, resultActions)
+    fn(mock)
+
+    mock.setupWireMock(headers, method)
+        .addDocumentation(docsIdentifier)
+}
+
+private fun MockHttpServletRequestBuilder.addHeaders(headers: HttpHeaders?): MockHttpServletRequestBuilder {
+    headers?.let { this.headers(it) }
+    return this
+}
+
+private fun MockHttpServletRequestBuilder.addBody(body: Any?): MockHttpServletRequestBuilder {
     body?.let {
         val jsonString = if (it is String) {
             it
@@ -79,16 +96,7 @@ private fun MockMvc.execute(
             jacksonObjectMapper().writeValueAsString(it)
         }
 
-        builder.content(jsonString)
+        this.content(jsonString)
     }
-
-    val resultActions = this.perform(builder)
-    val mock = MockMvcData(path, resultActions)
-    fn(mock)
-
-    mock.andDo(mock.setupWireMock(headers, method))
-
-    docsIdentifier?.let {
-        mock.andDo(document(it))
-    }
+    return this
 }

@@ -8,8 +8,8 @@ import com.github.tomakehurst.wiremock.matching.UrlPattern
 import org.springframework.cloud.contract.wiremock.restdocs.WireMockRestDocs
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.test.web.servlet.ResultActions
-import org.springframework.test.web.servlet.ResultHandler
 
 data class MockMvcData(val path: Path, val results: ResultActions) : ResultActions by results {
     private val containsPlaceholder = Regex(pattern = "\\{.+?}")
@@ -41,14 +41,20 @@ data class MockMvcData(val path: Path, val results: ResultActions) : ResultActio
             null
         }
 
-    fun setupWireMock(headers: HttpHeaders?, method: HttpMethod): ResultHandler {
+    fun setupWireMock(headers: HttpHeaders?, method: HttpMethod): MockMvcData {
         val mappingBuilder = this.request(method)
 
         headers?.keys?.forEach {
             mappingBuilder.withHeader(it, WireMock.matching(".+"))
         }
-        return WireMockRestDocs.verify().wiremock(mappingBuilder.atPriority(path.priority))
+        val resultActions = this.andDo(WireMockRestDocs.verify().wiremock(mappingBuilder.atPriority(path.priority)))
+        return this.copy(results = resultActions)
     }
+
+    fun addDocumentation(docsIdentifier: String?) =
+        docsIdentifier?.let {
+            this.copy(results = this.andDo(document(it)))
+        } ?: this
 }
 
 class Path(
