@@ -51,7 +51,6 @@ data class MockMvcData(val path: Path, val results: ResultActions) : ResultActio
 
 class Path(
     val url: String,
-    vararg val vars: String
-) {
-    val priority = if (vars.isEmpty()) 1 else 2
-}
+    vararg val vars: String,
+    val priority: Int = if (vars.isEmpty()) 1 else 2
+)
