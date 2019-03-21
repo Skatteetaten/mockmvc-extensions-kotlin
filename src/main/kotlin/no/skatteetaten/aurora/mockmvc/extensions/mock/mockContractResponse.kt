@@ -5,16 +5,23 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.mockito.BDDMockito
 
-inline fun <reified T : Any> BDDMockito.BDDMyOngoingStubbing<T?>.willReturnContractResponse(
+inline fun <reified T : Any> BDDMockito.BDDMyOngoingStubbing<T>.withContractResponse(
     name: String,
     folder: String = "contracts",
     extension: String = "json",
-    objectMapper: ObjectMapper = jacksonObjectMapper()
-): ExtendedBDDMyOngoingStubbing<T?> {
+    objectMapper: ObjectMapper = jacksonObjectMapper(),
+    fn: ExtendedBDDMyOngoingStubbing<T>.() -> BDDMockito.BDDMyOngoingStubbing<T>
+): ExtendedBDDMyOngoingStubbing<T> {
     val fileName = "/$folder/$name.$extension"
-    val content = objectMapper.readValue<T?>(this::class.java.getResource(fileName))
-    return ExtendedBDDMyOngoingStubbing(this.willReturn(content), content)
+    val content = objectMapper.readValue<T>(this::class.java.getResource(fileName))
+
+    val onGoingStubbing = fn(ExtendedBDDMyOngoingStubbing(this, content))
+
+    return ExtendedBDDMyOngoingStubbing(onGoingStubbing, content)
 }
 
 class ExtendedBDDMyOngoingStubbing<T>(ongoingStubbing: BDDMockito.BDDMyOngoingStubbing<T>, val content: T?) :
-    BDDMockito.BDDMyOngoingStubbing<T> by ongoingStubbing
+    BDDMockito.BDDMyOngoingStubbing<T> by ongoingStubbing {
+    val mockResponse = content
+}
+
