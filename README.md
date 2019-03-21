@@ -65,7 +65,8 @@ given(mock.getTestObject()).withContractResponse("test-response"){ willReturn(co
 
 It is also possible to get the object created from the json file
 ```
-val testObject = given(mock.getTestObject()).withContractResponse("test-response"){ willReturn(content) }.mockResponse
+val testObject = given(mock.getTestObject()).withContractResponse("test-response")
+                     { willReturn(content) }.mockResponse
 ```
 
 
