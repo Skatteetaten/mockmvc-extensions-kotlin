@@ -1,5 +1,6 @@
 package no.skatteetaten.aurora.mockmvc.extensions
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.convertValue
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.jayway.jsonpath.JsonPath
@@ -21,8 +22,8 @@ data class JsonPathEquals(val expression: String, val resultActions: ResultActio
         return resultActions
     }
 
-    fun equalsObject(expected: Any): ResultActions {
-        val expectedValue = jacksonObjectMapper().convertValue<LinkedHashMap<String, *>>(expected)
+    fun equalsObject(expected: Any, objectMapper: ObjectMapper = jacksonObjectMapper()): ResultActions {
+        val expectedValue = objectMapper.convertValue<LinkedHashMap<String, *>>(expected)
         resultActions.andExpect {
             val response = JsonPath.read<LinkedHashMap<String, *>>(it.response.contentAsString, expression)
             Assertions.assertEquals(expectedValue, response)

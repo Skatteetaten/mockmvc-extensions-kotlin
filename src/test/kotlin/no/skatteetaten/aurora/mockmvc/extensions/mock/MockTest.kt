@@ -16,10 +16,13 @@ class MockTest {
     @Test
     fun `Return object from json file in mock`() {
         val mock = mock(MockMe::class.java)
-        val mockedContent = given(mock.getTestObject()).willReturnContractResponse("test-response").content
+        val testObject = given(mock.getTestObject())
+            .withContractResponse("test-response") {
+                willReturn(content)
+            }.mockResponse
 
-        val testObject = mock.getTestObject()
+        val mockedTestObject = mock.getTestObject()
 
-        assertThat(testObject).isEqualTo(mockedContent)
+        assertThat(mockedTestObject).isEqualTo(testObject)
     }
 }
