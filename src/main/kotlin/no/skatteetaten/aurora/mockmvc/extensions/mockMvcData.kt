@@ -31,8 +31,10 @@ data class MockMvcData(val path: Path, val results: ResultActions) : ResultActio
         if (requestUrl.contains(containsPlaceholder)) {
             UrlPattern(
                 RegexPattern(
-                    requestUrl.replace(containsPlaceholder, Regex.escapeReplacement("[\\w-]+"))
-                        .replace("?", "\\?")
+                    requestUrl.replace(
+                        containsPlaceholder,
+                        Regex.escapeReplacement("[\\w-]+")
+                    ).replace("?", "\\?")
                 ), true
             )
         } else {
