@@ -31,10 +31,9 @@ data class MockMvcData(val path: Path, val results: ResultActions) : ResultActio
         if (requestUrl.contains(containsPlaceholder)) {
             UrlPattern(
                 RegexPattern(
-                    requestUrl.replace(
-                        containsPlaceholder,
-                        Regex.escapeReplacement("[\\w-]+")
-                    ).replace("?", "\\?")
+                    requestUrl
+                        .replace(containsPlaceholder, Regex.escapeReplacement("[\\w-]+"))
+                        .replace("?", "\\?")
                 ), true
             )
         } else {
@@ -52,9 +51,7 @@ data class MockMvcData(val path: Path, val results: ResultActions) : ResultActio
     }
 
     fun addDocumentation(docsIdentifier: String?) =
-        docsIdentifier?.let {
-            this.copy(results = this.andDo(document(it)))
-        } ?: this
+        docsIdentifier?.let { this.copy(results = this.andDo(document(it))) } ?: this
 }
 
 class Path(

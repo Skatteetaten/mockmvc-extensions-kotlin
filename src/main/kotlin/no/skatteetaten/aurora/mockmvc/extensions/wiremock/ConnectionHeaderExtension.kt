@@ -8,6 +8,7 @@ import com.github.tomakehurst.wiremock.http.HttpHeaders
 import com.github.tomakehurst.wiremock.http.Request
 import com.github.tomakehurst.wiremock.http.Response
 import org.springframework.cloud.contract.verifier.dsl.wiremock.WireMockExtensions
+import org.springframework.http.HttpHeaders.CONNECTION
 
 class MockMvcWireMockExtensions : WireMockExtensions {
     override fun extensions() = mutableListOf(ConnectionHeaderTransformer())
@@ -21,7 +22,7 @@ class ConnectionHeaderTransformer : ResponseTransformer() {
         parameters: Parameters?
     ): Response =
         Response.Builder.like(response)
-            .headers(HttpHeaders.copyOf(response?.headers).plus(HttpHeader("Connection", "Close")))
+            .headers(HttpHeaders.copyOf(response?.headers).plus(HttpHeader(CONNECTION, "Close")))
             .build()
 
     override fun getName() = this::class.simpleName

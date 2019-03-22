@@ -83,12 +83,10 @@ private fun MockMvc.execute(
         .addDocumentation(docsIdentifier)
 }
 
-private fun MockHttpServletRequestBuilder.addHeaders(headers: HttpHeaders?): MockHttpServletRequestBuilder {
-    headers?.let { this.headers(it) }
-    return this
-}
+private fun MockHttpServletRequestBuilder.addHeaders(headers: HttpHeaders?) =
+    headers?.let { this.headers(it) } ?: this
 
-private fun MockHttpServletRequestBuilder.addBody(body: Any?): MockHttpServletRequestBuilder {
+private fun MockHttpServletRequestBuilder.addBody(body: Any?) =
     body?.let {
         val jsonString = if (it is String) {
             it
@@ -97,6 +95,4 @@ private fun MockHttpServletRequestBuilder.addBody(body: Any?): MockHttpServletRe
         }
 
         this.content(jsonString)
-    }
-    return this
-}
+    } ?: this

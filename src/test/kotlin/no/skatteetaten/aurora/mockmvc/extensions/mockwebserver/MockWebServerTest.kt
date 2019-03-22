@@ -65,7 +65,7 @@ class MockWebServerTest {
 
     @Test
     fun `Test execute with request and response object`() {
-        val request = server.execute(TestObject("test")) {
+        val request = server.execute(TestObject("test"), objectMapper = jacksonObjectMapper()) {
             val response = RestTemplate().postForEntity<String>(url.toString(), TestObject("test-request-body"))
             assertThat(response).isOk()
             assertThat(response.body).isEqualTo("""{"value":"test"}""")
