@@ -25,11 +25,10 @@ data class JsonPathEquals(val expression: String, val resultActions: ResultActio
 
     fun equalsObject(expected: Any, objectMapper: ObjectMapper = jacksonObjectMapper()): ResultActions {
         val expectedValue = objectMapper.convertValue<LinkedHashMap<String, *>>(expected)
-        resultActions.andExpect {
+        return resultActions.andExpect {
             val response = JsonPath.read<LinkedHashMap<String, *>>(it.response.contentAsString, expression)
             Assertions.assertEquals(expectedValue, response)
         }
-        return resultActions
     }
 
     fun isEmpty(): ResultActions = resultActions.andExpect(jsonPath(expression).isEmpty)

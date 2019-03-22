@@ -15,17 +15,18 @@ data class MockMvcData(val path: Path, val results: ResultActions) : ResultActio
     private val containsPlaceholder = Regex(pattern = "\\{.+?}")
     private val requestUrl = path.url
 
-    fun request(method: HttpMethod): MappingBuilder =
-        when (method) {
-            HttpMethod.GET -> getWireMockUrl()?.let { WireMock.get(it) } ?: WireMock.get(requestUrl)
-            HttpMethod.POST -> getWireMockUrl()?.let { WireMock.post(it) } ?: WireMock.post(requestUrl)
-            HttpMethod.PUT -> getWireMockUrl()?.let { WireMock.put(it) } ?: WireMock.put(requestUrl)
-            HttpMethod.PATCH -> getWireMockUrl()?.let { WireMock.patch(it) } ?: WireMock.patch(
-                UrlPattern(AnythingPattern(requestUrl), false)
-            )
-            HttpMethod.DELETE -> getWireMockUrl()?.let { WireMock.delete(it) } ?: WireMock.delete(requestUrl)
+    fun request(method: HttpMethod): MappingBuilder {
+        val url = getWireMockUrl()
+        return when (method) {
+            HttpMethod.GET -> url?.let { WireMock.get(it) } ?: WireMock.get(requestUrl)
+            HttpMethod.POST -> url?.let { WireMock.post(it) } ?: WireMock.post(requestUrl)
+            HttpMethod.PUT -> url?.let { WireMock.put(it) } ?: WireMock.put(requestUrl)
+            HttpMethod.PATCH -> url?.let { WireMock.patch(it) }
+                ?: WireMock.patch(UrlPattern(AnythingPattern(requestUrl), false))
+            HttpMethod.DELETE -> url?.let { WireMock.delete(it) } ?: WireMock.delete(requestUrl)
             else -> throw IllegalArgumentException("MockMvc extensions does not support ${method.name}")
         }
+    }
 
     fun getWireMockUrl(): UrlPattern? =
         if (requestUrl.contains(containsPlaceholder)) {
