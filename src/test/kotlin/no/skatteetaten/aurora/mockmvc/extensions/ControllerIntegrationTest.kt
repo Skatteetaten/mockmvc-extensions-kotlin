@@ -1,7 +1,7 @@
 package no.skatteetaten.aurora.mockmvc.extensions
 
 import assertk.assertThat
-import assertk.assertions.isEqualTo
+import assertk.assertions.isTrue
 import no.skatteetaten.aurora.mockmvc.extensions.testutils.TestController
 import no.skatteetaten.aurora.mockmvc.extensions.testutils.TestObject
 import org.junit.jupiter.api.Test
@@ -97,7 +97,7 @@ class ControllerIntegrationTest {
     }
 
     @Test
-    fun `Get request with rest docs`() {
+    fun `Get request with rest docs identifier`() {
         val restDocsIdentifier = "get-with-restdocs"
         mockMvc.get(
             docsIdentifier = restDocsIdentifier,
@@ -105,8 +105,7 @@ class ControllerIntegrationTest {
         ) {
             statusIsOk().responseJsonPath("$.value").equalsValue("test")
         }
-
-        val stubFileName = File("target/generated-snippets/stubs").listFiles().first().name
-        assertThat("$restDocsIdentifier.json").isEqualTo(stubFileName)
+        val stubFileName = File("target/generated-snippets/stubs/$restDocsIdentifier.json")
+        assertThat(stubFileName.isFile).isTrue()
     }
 }

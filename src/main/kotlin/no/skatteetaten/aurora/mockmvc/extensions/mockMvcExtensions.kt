@@ -80,7 +80,7 @@ private fun MockMvc.execute(
     fn(mock)
 
     mock.setupWireMock(headers, method)
-        .addDocumentation(docsIdentifier)
+        .addDocumentation(method, docsIdentifier)
 }
 
 private fun MockHttpServletRequestBuilder.addHeaders(headers: HttpHeaders?) =

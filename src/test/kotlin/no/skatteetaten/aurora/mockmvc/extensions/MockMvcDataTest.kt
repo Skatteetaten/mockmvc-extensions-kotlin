@@ -1,6 +1,7 @@
 package no.skatteetaten.aurora.mockmvc.extensions
 
 import assertk.assertThat
+import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotNull
@@ -13,7 +14,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.http.HttpMethod
-import java.lang.IllegalArgumentException
 
 class MockMvcDataTest {
 
@@ -61,4 +61,23 @@ class MockMvcDataTest {
 
         assertThat(urlPattern).isNull()
     }
+
+    @Test
+    fun `Get snippet name for exact path`() {
+        val snippetName = MockMvcData(Path("/test"), mockk()).getSnippetName(HttpMethod.GET)
+        assertThat(snippetName).isEqualTo("get-test")
+    }
+
+    @Test
+    fun `Get snippet name for template path`() {
+        val snippetName = MockMvcData(Path("/test/{name}/{id}"), mockk()).getSnippetName(HttpMethod.POST)
+        assertThat(snippetName).isEqualTo("post-test-name-id")
+    }
+
+    @Test
+    fun `Get snippet name for path with query params`() {
+        val snippetName = MockMvcData(Path("/test/test123?testing=123"), mockk()).getSnippetName(HttpMethod.PUT)
+        assertThat(snippetName).isEqualTo("put-test-test123_testing=123")
+    }
+
 }

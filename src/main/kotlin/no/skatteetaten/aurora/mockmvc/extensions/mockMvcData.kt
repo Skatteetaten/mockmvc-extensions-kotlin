@@ -51,8 +51,13 @@ data class MockMvcData(val path: Path, val results: ResultActions) : ResultActio
         return this.copy(results = resultActions)
     }
 
-    fun addDocumentation(docsIdentifier: String?) =
-        docsIdentifier?.let { this.copy(results = this.andDo(document(it))) } ?: this
+    fun addDocumentation(method: HttpMethod, docsIdentifier: String?): MockMvcData {
+        val snippetName = docsIdentifier ?: getSnippetName(method)
+        return this.copy(results = this.andDo(document(snippetName)))
+    }
+
+    fun getSnippetName(method: HttpMethod) = method.name.toLowerCase() +
+        path.url.replace("/", "-").replace("?", "_").replace(Regex("[{}]"), "")
 }
 
 class Path(
