@@ -11,11 +11,11 @@ For examples look at the [unit tests](https://github.com/Skatteetaten/mockmvc-ex
 **GET request**
 ```
 mockMvc.get(
+  path = Path("/test/{id}", "123"),
   headers = HttpHeaders().authorization("test"),
-  docsIdentifier = "my-docs",
-  path = Path("/test/{id}", "123")
+  docsIdentifier = "my-docs"
 ) {
-   it.statusIsOk().responseJsonPath("$.value").equalsValue("test")
+   statusIsOk().responseJsonPath("$.value").equalsValue("test")
 }
 ```
 
@@ -25,7 +25,7 @@ mockMvc.post(
   path = Path("/test"),
   body = "test123"
 ) {
-    it.statusIsOk().responseJsonPath("$.key").equalsValue("test123")
+    statusIsOk().responseJsonPath("$.key").equalsValue("test123")
 }
 ```
 
@@ -40,14 +40,14 @@ mockMvc.post(
 ---
 
 There are also convenience methods for asserting with JsonPath.  
-* *Equals value:* `it.statusIsOk().responseJsonPath("$.value").equalsValue("test")`
-* *Equals object:* `it.statusIsOk().responseJsonPath("$").equalsObject(TestObject())`
+* *Equals value:* `statusIsOk().responseJsonPath("$.value").equalsValue("test")`
+* *Equals object:* `statusIsOk().responseJsonPath("$").equalsObject(TestObject())`
 
 ## Rest docs
 
 To generate rest docs add `@AutoConfigureRestDocs` to your unit test class and include the `docsIdentifier`:
 ```
-mockMvc.get(docsIdentifier = "my-docs", path = Path("/test")) { ... }
+mockMvc.get(path = Path("/test"), docsIdentifier = "my-docs") { ... }
 ```
 
 This will by default generate the restdocs snippets in `<target/build>/generated-snippets/<docsIdentifier>/*.adoc`
