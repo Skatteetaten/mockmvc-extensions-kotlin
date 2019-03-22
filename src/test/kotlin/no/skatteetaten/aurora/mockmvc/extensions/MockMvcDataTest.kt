@@ -76,8 +76,8 @@ class MockMvcDataTest {
 
     @Test
     fun `Get snippet name for path with query params`() {
-        val snippetName = MockMvcData(Path("/test/test123?testing=123"), mockk()).getSnippetName(HttpMethod.PUT)
-        assertThat(snippetName).isEqualTo("put-test-test123_testing=123")
+        val snippetName = MockMvcData(Path("/test/test123?testing=123&test=abc"), mockk()).getSnippetName(HttpMethod.PUT)
+        assertThat(snippetName).isEqualTo("put-test-test123_testing=123&test=abc")
     }
 
 }
