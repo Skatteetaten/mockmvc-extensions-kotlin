@@ -11,11 +11,7 @@ import org.springframework.core.io.ClassPathResource
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 
-private fun MockWebServer.enqueueJson(
-    status: Int = 200,
-    body: Any,
-    objectMapper: ObjectMapper
-) {
+private fun MockWebServer.enqueueJson(status: Int = 200, body: Any, objectMapper: ObjectMapper) {
     val json = body as? String ?: objectMapper.writeValueAsString(body)
     val response = MockResponse()
         .setResponseCode(status)

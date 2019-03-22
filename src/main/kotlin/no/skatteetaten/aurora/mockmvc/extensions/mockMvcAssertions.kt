@@ -18,10 +18,7 @@ fun ResultActions.statusIsOk(): ResultActions =
     this.andExpect(status().isOk)
 
 data class JsonPathEquals(val expression: String, val resultActions: ResultActions) {
-    fun equalsValue(value: Any): ResultActions {
-        resultActions.andExpect(jsonPath(expression, Matchers.equalTo(value)))
-        return resultActions
-    }
+    fun equalsValue(value: Any): ResultActions = resultActions.andExpect(jsonPath(expression, Matchers.equalTo(value)))
 
     fun equalsObject(expected: Any, objectMapper: ObjectMapper = jacksonObjectMapper()): ResultActions {
         val expectedValue = objectMapper.convertValue<LinkedHashMap<String, *>>(expected)

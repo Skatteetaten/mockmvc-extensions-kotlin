@@ -12,7 +12,7 @@ import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.test.web.servlet.ResultActions
 
 data class MockMvcData(val path: Path, val results: ResultActions) : ResultActions by results {
-    private val containsPlaceholder = Regex(pattern = "\\{.+?}")
+    private val placeholder = Regex(pattern = "\\{.+?}")
     private val requestUrl = path.url
 
     fun request(method: HttpMethod): MappingBuilder {
@@ -29,11 +29,11 @@ data class MockMvcData(val path: Path, val results: ResultActions) : ResultActio
     }
 
     fun getWireMockUrl(): UrlPattern? =
-        if (requestUrl.contains(containsPlaceholder)) {
+        if (requestUrl.contains(placeholder)) {
             UrlPattern(
                 RegexPattern(
                     requestUrl
-                        .replace(containsPlaceholder, Regex.escapeReplacement("[\\w-]+"))
+                        .replace(placeholder, Regex.escapeReplacement("[\\w-]+"))
                         .replace("?", "\\?")
                 ), true
             )
