@@ -24,42 +24,42 @@ fun HttpHeaders.header(key: String, value: String): HttpHeaders {
 }
 
 fun MockMvc.get(
+    path: Path,
     headers: HttpHeaders? = null,
     docsIdentifier: String? = null,
-    path: Path,
-    fn: (mockMvcData: MockMvcData) -> Unit
+    fn: MockMvcData.() -> Unit
 ) = this.execute(HttpMethod.GET, headers, null, path, fn, docsIdentifier)
 
 fun MockMvc.post(
-    headers: HttpHeaders? = null,
-    body: Any? = null,
-    docsIdentifier: String? = null,
     path: Path,
-    fn: (mockMvcData: MockMvcData) -> Unit
+    body: Any? = null,
+    headers: HttpHeaders? = null,
+    docsIdentifier: String? = null,
+    fn: MockMvcData.() -> Unit
 ) = this.execute(HttpMethod.POST, headers, body, path, fn, docsIdentifier)
 
 fun MockMvc.put(
-    headers: HttpHeaders? = null,
-    body: Any? = null,
-    docsIdentifier: String? = null,
     path: Path,
-    fn: (mockMvcData: MockMvcData) -> Unit
+    body: Any? = null,
+    headers: HttpHeaders? = null,
+    docsIdentifier: String? = null,
+    fn: MockMvcData.() -> Unit
 ) = this.execute(HttpMethod.PUT, headers, body, path, fn, docsIdentifier)
 
 fun MockMvc.patch(
-    headers: HttpHeaders? = null,
-    body: Any? = null,
-    docsIdentifier: String? = null,
     path: Path,
-    fn: (mockMvcData: MockMvcData) -> Unit
+    body: Any? = null,
+    headers: HttpHeaders? = null,
+    docsIdentifier: String? = null,
+    fn: MockMvcData.() -> Unit
 ) = this.execute(HttpMethod.PATCH, headers, body, path, fn, docsIdentifier)
 
 fun MockMvc.delete(
-    headers: HttpHeaders? = null,
-    body: Any? = null,
-    docsIdentifier: String? = null,
     path: Path,
-    fn: (mockMvcData: MockMvcData) -> Unit
+    body: Any? = null,
+    headers: HttpHeaders? = null,
+    docsIdentifier: String? = null,
+    fn: MockMvcData.() -> Unit
 ) = this.execute(HttpMethod.DELETE, headers, body, path, fn, docsIdentifier)
 
 private fun MockMvc.execute(
