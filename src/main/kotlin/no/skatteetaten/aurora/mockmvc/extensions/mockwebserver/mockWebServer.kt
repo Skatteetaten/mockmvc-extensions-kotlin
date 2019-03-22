@@ -11,11 +11,7 @@ import org.springframework.core.io.ClassPathResource
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 
-private fun MockWebServer.enqueueJson(
-    status: Int = 200,
-    body: Any,
-    objectMapper: ObjectMapper = jacksonObjectMapper()
-) {
+private fun MockWebServer.enqueueJson(status: Int = 200, body: Any, objectMapper: ObjectMapper) {
     val json = body as? String ?: objectMapper.writeValueAsString(body)
     val response = MockResponse()
         .setResponseCode(status)
@@ -54,11 +50,15 @@ fun MockWebServer.execute(
     }
 }
 
-fun MockWebServer.execute(vararg responses: Any, fn: () -> Unit): List<RecordedRequest> {
+fun MockWebServer.execute(
+    vararg responses: Any,
+    objectMapper: ObjectMapper = jacksonObjectMapper(),
+    fn: () -> Unit
+): List<RecordedRequest> {
     fun takeRequests() = (1..responses.size).toList().map { this.takeRequest() }
 
     try {
-        responses.forEach { this.enqueueJson(body = it) }
+        responses.forEach { this.enqueueJson(body = it, objectMapper = objectMapper) }
         fn()
         return takeRequests()
     } catch (t: Throwable) {
@@ -74,9 +74,12 @@ fun MockResponse.setJsonFileAsBody(fileName: String): MockResponse {
     return this.setBody(json)
 }
 
-inline fun <reified T> RecordedRequest.bodyAsObject(path: String = "$"): T {
+inline fun <reified T> RecordedRequest.bodyAsObject(
+    path: String = "$",
+    objectMapper: ObjectMapper = jacksonObjectMapper()
+): T {
     val content: Any = JsonPath.parse(String(body.readByteArray())).read(path)
-    return jacksonObjectMapper().convertValue(content)
+    return objectMapper.convertValue(content)
 }
 
 fun RecordedRequest.bodyAsString(): String = this.body.readUtf8()

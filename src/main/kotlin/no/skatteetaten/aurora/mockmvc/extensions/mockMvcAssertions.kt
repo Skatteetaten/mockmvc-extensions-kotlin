@@ -15,21 +15,17 @@ fun ResultActions.status(expected: HttpStatus): ResultActions =
     this.andExpect(status().`is`(expected.value()))
 
 fun ResultActions.statusIsOk(): ResultActions =
-    this.andExpect(status().`is`(HttpStatus.OK.value()))
+    this.andExpect(status().isOk)
 
 data class JsonPathEquals(val expression: String, val resultActions: ResultActions) {
-    fun equalsValue(value: Any): ResultActions {
-        resultActions.andExpect(jsonPath(expression, Matchers.equalTo(value)))
-        return resultActions
-    }
+    fun equalsValue(value: Any): ResultActions = resultActions.andExpect(jsonPath(expression, Matchers.equalTo(value)))
 
     fun equalsObject(expected: Any, objectMapper: ObjectMapper = jacksonObjectMapper()): ResultActions {
         val expectedValue = objectMapper.convertValue<LinkedHashMap<String, *>>(expected)
-        resultActions.andExpect {
+        return resultActions.andExpect {
             val response = JsonPath.read<LinkedHashMap<String, *>>(it.response.contentAsString, expression)
             Assertions.assertEquals(expectedValue, response)
         }
-        return resultActions
     }
 
     fun isEmpty(): ResultActions = resultActions.andExpect(jsonPath(expression).isEmpty)
