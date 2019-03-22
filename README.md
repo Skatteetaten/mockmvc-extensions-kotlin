@@ -45,7 +45,10 @@ There are also convenience methods for asserting with JsonPath.
 
 ## Rest docs
 
-To generate rest docs add `@AutoConfigureRestDocs` to your unit test class and include the `docsIdentifier`:
+To generate rest docs add `@AutoConfigureRestDocs` to your unit test class.
+By default the snippet name will be generated based on the HTTP verb and path, for example `GET /test/{id}` will generate `get-test-id`.
+
+You can also specify the snippet name directly by including `docsIdentier`:
 ```
 mockMvc.get(path = Path("/test"), docsIdentifier = "my-docs") { ... }
 ```
