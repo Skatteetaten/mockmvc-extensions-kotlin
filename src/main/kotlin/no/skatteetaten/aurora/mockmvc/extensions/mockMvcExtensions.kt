@@ -43,7 +43,7 @@ fun MockMvc.put(
     body: Any? = null,
     headers: HttpHeaders? = null,
     docsIdentifier: String? = null,
-    fn: MockMvcData.()-> Unit
+    fn: MockMvcData.() -> Unit
 ) = this.execute(HttpMethod.PUT, headers, body, path, fn, docsIdentifier)
 
 fun MockMvc.patch(
