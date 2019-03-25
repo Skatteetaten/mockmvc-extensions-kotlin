@@ -3,13 +3,14 @@ package no.skatteetaten.aurora.mockmvc.extensions.mock
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import no.skatteetaten.aurora.mockmvc.extensions.TestObjectMapperConfigurer
 import org.mockito.BDDMockito
 
 inline fun <reified T : Any> BDDMockito.BDDMyOngoingStubbing<T>.withContractResponse(
     name: String,
     folder: String = "contracts",
     extension: String = "json",
-    objectMapper: ObjectMapper = jacksonObjectMapper(),
+    objectMapper: ObjectMapper = TestObjectMapperConfigurer.objectMapper,
     fn: ExtendedBDDMyOngoingStubbing<T>.() -> BDDMockito.BDDMyOngoingStubbing<T>
 ): ExtendedBDDMyOngoingStubbing<T> {
     val fileName = "/$folder/$name.$extension"

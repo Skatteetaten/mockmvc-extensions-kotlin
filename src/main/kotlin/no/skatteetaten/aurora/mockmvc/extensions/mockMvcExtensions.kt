@@ -1,5 +1,6 @@
 package no.skatteetaten.aurora.mockmvc.extensions
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -96,3 +97,8 @@ private fun MockHttpServletRequestBuilder.addBody(body: Any?) =
 
         this.content(jsonString)
     } ?: this
+
+
+object TestObjectMapperConfigurer {
+    var objectMapper: ObjectMapper = jacksonObjectMapper()
+}
