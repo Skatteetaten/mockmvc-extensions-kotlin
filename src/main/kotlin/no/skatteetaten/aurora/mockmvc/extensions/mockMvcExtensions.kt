@@ -92,13 +92,16 @@ private fun MockHttpServletRequestBuilder.addBody(body: Any?) =
         val jsonString = if (it is String) {
             it
         } else {
-            jacksonObjectMapper().writeValueAsString(it)
+            TestObjectMapperConfigurer.objectMapper.writeValueAsString(it)
         }
 
         this.content(jsonString)
     } ?: this
 
-
 object TestObjectMapperConfigurer {
     var objectMapper: ObjectMapper = jacksonObjectMapper()
+
+    fun reset() {
+        this.objectMapper = jacksonObjectMapper()
+    }
 }
