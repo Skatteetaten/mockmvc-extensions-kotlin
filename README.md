@@ -82,7 +82,14 @@ server.execute(201 to TestObject("test"), objectMapper = jacksonObjectMapper()) 
 
 Or by setting the `ObjectMapper` before the actual unit tests run: 
 ```
-TestObjectMapperConfigurer.objectMapper = myCustomObjectMapper
+init {
+    TestObjectMapperConfigurer.objectMapper = customObjectMapper()
+}
+
+@AfterAll
+fun tearDown() {
+    TestObjectMapperConfigurer.reset()
+}
 ```
 
 
