@@ -1,5 +1,8 @@
 package no.skatteetaten.aurora.mockmvc.extensions.testutils
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.http.HttpHeaders
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -10,8 +13,11 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RestController
+import java.time.Instant
 
 data class TestObject(val value1: String = "123", val value2: String = "abc", val success: Boolean = true)
+
+data class TimeObject(val time: Instant = Instant.now())
 
 @RestController
 class TestController {
@@ -43,4 +49,11 @@ class TestController {
     fun deleteTest(@RequestBody value: String) {
         println("Delete body: $value")
     }
+
+    @PostMapping("/custom-object-mapper")
+    fun getTime(@RequestBody timeObject: TimeObject): String = customObjectMapper().writeValueAsString(timeObject)
 }
+
+fun customObjectMapper(): ObjectMapper = jacksonObjectMapper()
+    .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+    .registerModule(JavaTimeModule())

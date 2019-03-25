@@ -2,8 +2,8 @@ package no.skatteetaten.aurora.mockmvc.extensions.mockwebserver
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.convertValue
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.jayway.jsonpath.JsonPath
+import no.skatteetaten.aurora.mockmvc.extensions.TestObjectMapperConfigurer
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
@@ -35,7 +35,7 @@ fun MockWebServer.execute(vararg responses: MockResponse, fn: () -> Unit): List<
 
 fun MockWebServer.execute(
     vararg responses: Pair<Int, Any>,
-    objectMapper: ObjectMapper = jacksonObjectMapper(),
+    objectMapper: ObjectMapper = TestObjectMapperConfigurer.objectMapper,
     fn: () -> Unit
 ): List<RecordedRequest> {
     fun takeRequests() = (1..responses.size).toList().map { this.takeRequest() }
@@ -52,7 +52,7 @@ fun MockWebServer.execute(
 
 fun MockWebServer.execute(
     vararg responses: Any,
-    objectMapper: ObjectMapper = jacksonObjectMapper(),
+    objectMapper: ObjectMapper = TestObjectMapperConfigurer.objectMapper,
     fn: () -> Unit
 ): List<RecordedRequest> {
     fun takeRequests() = (1..responses.size).toList().map { this.takeRequest() }
@@ -76,7 +76,7 @@ fun MockResponse.setJsonFileAsBody(fileName: String): MockResponse {
 
 inline fun <reified T> RecordedRequest.bodyAsObject(
     path: String = "$",
-    objectMapper: ObjectMapper = jacksonObjectMapper()
+    objectMapper: ObjectMapper = TestObjectMapperConfigurer.objectMapper
 ): T {
     val content: Any = JsonPath.parse(String(body.readByteArray())).read(path)
     return objectMapper.convertValue(content)

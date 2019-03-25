@@ -20,7 +20,7 @@ fun ResultActions.statusIsOk(): ResultActions =
 data class JsonPathEquals(val expression: String, val resultActions: ResultActions) {
     fun equalsValue(value: Any): ResultActions = resultActions.andExpect(jsonPath(expression, Matchers.equalTo(value)))
 
-    fun equalsObject(expected: Any, objectMapper: ObjectMapper = jacksonObjectMapper()): ResultActions {
+    fun equalsObject(expected: Any, objectMapper: ObjectMapper = TestObjectMapperConfigurer.objectMapper): ResultActions {
         val expectedValue = objectMapper.convertValue<LinkedHashMap<String, *>>(expected)
         return resultActions.andExpect {
             val response = JsonPath.read<LinkedHashMap<String, *>>(it.response.contentAsString, expression)
