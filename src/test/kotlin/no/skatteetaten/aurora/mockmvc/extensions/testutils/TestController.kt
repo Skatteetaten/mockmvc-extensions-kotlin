@@ -27,8 +27,7 @@ class TestController {
     fun getTest() = """{ "value": "test" }"""
 
     @GetMapping("/test-with-filename/{filename:.+}")
-    fun getTestWithFileName(@PathVariable filename: String) =
-        """{ "value": "$filename" }"""
+    fun getTestWithFileName(@PathVariable filename: String) = """{ "value": "$filename" }"""
 
     @GetMapping("/test-with-header")
     fun getTestWithHeader(@RequestHeader(value = HttpHeaders.AUTHORIZATION) authorization: String) =
