@@ -51,7 +51,7 @@ class ControllerIntegrationTest {
     fun `Post request with request object`() {
         mockMvc.post(
             path = Path("/test-with-request-object"),
-            headers = HttpHeaders().contentType(),
+            headers = HttpHeaders().contentTypeJson(),
             body = TestObject(value1 = "123", value2 = "", success = false)
         ) {
             statusIsOk()

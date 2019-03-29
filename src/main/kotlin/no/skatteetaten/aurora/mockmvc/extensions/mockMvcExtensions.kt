@@ -14,10 +14,12 @@ fun HttpHeaders.authorization(value: String): HttpHeaders {
     return this
 }
 
-fun HttpHeaders.contentType(contentType: String = MediaType.APPLICATION_JSON_VALUE): HttpHeaders {
+fun HttpHeaders.contentType(contentType: String = MediaType.APPLICATION_JSON_UTF8_VALUE): HttpHeaders {
     this.set(HttpHeaders.CONTENT_TYPE, contentType)
     return this
 }
+
+fun HttpHeaders.contentTypeJson() = contentType()
 
 fun HttpHeaders.header(key: String, value: String): HttpHeaders {
     this.set(key, value)
