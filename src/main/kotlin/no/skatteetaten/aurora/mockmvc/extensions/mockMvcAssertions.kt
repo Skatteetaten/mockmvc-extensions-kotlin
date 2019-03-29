@@ -39,6 +39,8 @@ data class JsonPathEquals(val expression: String, val resultActions: ResultActio
 
 data class HeaderEquals(val name: String, val resultActions: ResultActions) {
     fun equals(value: String): ResultActions = resultActions.andExpect(header().string(name, Matchers.equalTo(value)))
+    fun startsWith(value: String): ResultActions =
+        resultActions.andExpect(header().string(name, Matchers.startsWith(value)))
 }
 
 fun ResultActions.responseJsonPath(jsonPath: String = "$") = JsonPathEquals(jsonPath, this)

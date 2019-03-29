@@ -41,7 +41,9 @@ class ControllerIntegrationTest {
     @Test
     fun `Post request with json response`() {
         mockMvc.post(path = Path("/test"), body = "test123") {
-            statusIsOk().responseJsonPath("$.key").equalsValue("test123")
+            statusIsOk()
+                .responseHeader(HttpHeaders.CONTENT_TYPE).startsWith(MediaType.APPLICATION_JSON_VALUE)
+                .responseJsonPath("$.key").equalsValue("test123")
         }
     }
 
