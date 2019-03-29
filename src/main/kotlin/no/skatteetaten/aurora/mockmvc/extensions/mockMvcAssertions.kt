@@ -2,7 +2,6 @@ package no.skatteetaten.aurora.mockmvc.extensions
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.convertValue
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.jayway.jsonpath.JsonPath
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.Assertions
@@ -34,4 +33,4 @@ data class JsonPathEquals(val expression: String, val resultActions: ResultActio
     fun isFalse(): ResultActions = resultActions.andExpect(jsonPath(expression).value(false))
 }
 
-fun ResultActions.responseJsonPath(jsonPath: String) = JsonPathEquals(jsonPath, this)
+fun ResultActions.responseJsonPath(jsonPath: String = "$") = JsonPathEquals(jsonPath, this)
