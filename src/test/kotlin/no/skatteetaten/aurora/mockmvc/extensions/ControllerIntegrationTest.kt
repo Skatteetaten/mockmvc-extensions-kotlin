@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
 import org.springframework.restdocs.RestDocumentationExtension
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
@@ -30,14 +31,19 @@ class ControllerIntegrationTest {
     @Test
     fun `Get request with json response`() {
         mockMvc.get(path = Path("/{test-path}", "test")) {
-            statusIsOk().responseJsonPath("$.value").equalsValue("test")
+            statusIsOk()
+                .responseHeader(HttpHeaders.CONTENT_TYPE).equals(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .responseJsonPath("$.value").equalsValue("test")
+                .printResponseBody()
         }
     }
 
     @Test
     fun `Post request with json response`() {
         mockMvc.post(path = Path("/test"), body = "test123") {
-            statusIsOk().responseJsonPath("$.key").equalsValue("test123")
+            statusIsOk()
+                .responseHeader(HttpHeaders.CONTENT_TYPE).startsWith(MediaType.APPLICATION_JSON_VALUE)
+                .responseJsonPath("$.key").equalsValue("test123")
         }
     }
 
@@ -107,5 +113,12 @@ class ControllerIntegrationTest {
         }
         val stubFileName = File("target/generated-snippets/stubs/$restDocsIdentifier.json")
         assertThat(stubFileName.isFile).isTrue()
+    }
+
+    @Test
+    fun `Get request with path containing filename`() {
+        mockMvc.get(Path("/test-with-filename/{filename}", "latest.properties")) {
+            statusIsOk().responseJsonPath("$.value").equalsValue("latest.properties")
+        }
     }
 }

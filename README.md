@@ -43,6 +43,10 @@ There are also convenience methods for asserting with JsonPath.
 * *Equals value:* `statusIsOk().responseJsonPath("$.value").equalsValue("test")`
 * *Equals object:* `statusIsOk().responseJsonPath("$").equalsObject(TestObject())`
 
+And to assert on response headers
+* *equals:* `statusIsOk().responseHeader(CONTENT_TYPE).equals(APPLICATION_JSON_UTF8_VALUE)`
+* *startsWith:* `statusIsOk().responseHeader(CONTENT_TYPE).startsWith(APPLICATION_JSON_VALUE)`
+
 ## Rest docs
 
 To generate rest docs add `@AutoConfigureRestDocs` to your unit test class.

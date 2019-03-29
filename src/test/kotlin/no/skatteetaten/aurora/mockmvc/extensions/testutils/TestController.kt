@@ -5,13 +5,16 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.time.Instant
 
@@ -20,10 +23,14 @@ data class TestObject(val value1: String = "123", val value2: String = "abc", va
 data class TimeObject(val time: Instant = Instant.now())
 
 @RestController
+@RequestMapping(produces = [MediaType.APPLICATION_JSON_UTF8_VALUE])
 class TestController {
 
     @GetMapping("/test")
     fun getTest() = """{ "value": "test" }"""
+
+    @GetMapping("/test-with-filename/{filename:.+}")
+    fun getTestWithFileName(@PathVariable filename: String) = """{ "value": "$filename" }"""
 
     @GetMapping("/test-with-header")
     fun getTestWithHeader(@RequestHeader(value = HttpHeaders.AUTHORIZATION) authorization: String) =
