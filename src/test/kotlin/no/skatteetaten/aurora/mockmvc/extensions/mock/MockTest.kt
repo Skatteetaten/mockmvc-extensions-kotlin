@@ -30,7 +30,7 @@ class MockTest {
     @Test
     fun `Return object from json file in mock when optional return type`() {
         val testObject = given(mock.getNullObject())
-            .withContractResponse("test-response") {
+            .withNullableContractResponse("test-response") {
                 willReturn(content)
             }.mockResponse
 
