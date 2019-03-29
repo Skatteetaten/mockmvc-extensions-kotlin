@@ -108,4 +108,11 @@ class ControllerIntegrationTest {
         val stubFileName = File("target/generated-snippets/stubs/$restDocsIdentifier.json")
         assertThat(stubFileName.isFile).isTrue()
     }
+
+    @Test
+    fun `Get request with path containing filename`() {
+        mockMvc.get(Path("/test-with-filename/{filename}", "latest.properties")) {
+            statusIsOk().responseJsonPath("$.value").equalsValue("latest.properties")
+        }
+    }
 }

@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -24,6 +25,10 @@ class TestController {
 
     @GetMapping("/test")
     fun getTest() = """{ "value": "test" }"""
+
+    @GetMapping("/test-with-filename/{filename:.+}")
+    fun getTestWithFileName(@PathVariable filename: String) =
+        """{ "value": "$filename" }"""
 
     @GetMapping("/test-with-header")
     fun getTestWithHeader(@RequestHeader(value = HttpHeaders.AUTHORIZATION) authorization: String) =

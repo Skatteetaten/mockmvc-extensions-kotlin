@@ -33,7 +33,7 @@ data class MockMvcData(val path: Path, val results: ResultActions) : ResultActio
             UrlPattern(
                 RegexPattern(
                     requestUrl
-                        .replace(placeholder, Regex.escapeReplacement("[\\w-]+"))
+                        .replace(placeholder, Regex.escapeReplacement("[\\w-\\.]+"))
                         .replace("?", "\\?")
                 ), true
             )
