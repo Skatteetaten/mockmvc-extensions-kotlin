@@ -44,8 +44,8 @@ There are also convenience methods for asserting with JsonPath.
 * *Equals object:* `statusIsOk().responseJsonPath("$").equalsObject(TestObject())`
 
 And to assert on response headers
-* *equals:* `statusIsOk().responseHeader(HttpHeaders.CONTENT_TYPE).equals(MediaType.APPLICATION_JSON_UTF8_VALUE)`
-* *startsWith:* `statusIsOk().responseHeader(HttpHeaders.CONTENT_TYPE).startsWith(MediaType.APPLICATION_JSON_VALUE)`
+* *equals:* `statusIsOk().responseHeader(CONTENT_TYPE).equals(APPLICATION_JSON_UTF8_VALUE)`
+* *startsWith:* `statusIsOk().responseHeader(CONTENT_TYPE).startsWith(APPLICATION_JSON_VALUE)`
 
 ## Rest docs
 
