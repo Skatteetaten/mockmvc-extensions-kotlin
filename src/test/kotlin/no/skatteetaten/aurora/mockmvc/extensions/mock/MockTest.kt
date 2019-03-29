@@ -9,19 +9,32 @@ import org.mockito.BDDMockito.mock
 
 open class MockMe {
     open fun getTestObject() = TestObject()
+    open fun getNullObject(): TestObject? = null
 }
 
 class MockTest {
+    private val mock = mock(MockMe::class.java)
 
     @Test
     fun `Return object from json file in mock`() {
-        val mock = mock(MockMe::class.java)
         val testObject = given(mock.getTestObject())
             .withContractResponse("test-response") {
                 willReturn(content)
             }.mockResponse
 
         val mockedTestObject = mock.getTestObject()
+
+        assertThat(mockedTestObject).isEqualTo(testObject)
+    }
+
+    @Test
+    fun `Return object from json file in mock when optional return type`() {
+        val testObject = given(mock.getNullObject())
+            .withContractResponse("test-response") {
+                willReturn(content)
+            }.mockResponse
+
+        val mockedTestObject = mock.getNullObject()
 
         assertThat(mockedTestObject).isEqualTo(testObject)
     }
