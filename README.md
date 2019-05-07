@@ -42,6 +42,7 @@ mockMvc.post(
 There are also convenience methods for asserting with JsonPath.  
 * *Equals value:* `statusIsOk().responseJsonPath("$.value").equalsValue("test")`
 * *Equals object:* `statusIsOk().responseJsonPath("$").equalsObject(TestObject())`
+* *Contains:*  `statusIsOk().responseJsonPath("$").contains("test"))`
 
 And to assert on response headers
 * *equals:* `statusIsOk().responseHeader(CONTENT_TYPE).equals(APPLICATION_JSON_UTF8_VALUE)`

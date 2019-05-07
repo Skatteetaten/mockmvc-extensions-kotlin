@@ -99,6 +99,7 @@ class ControllerIntegrationTest {
                 .responseJsonPath("$").equalsObject(TestObject())
                 .responseJsonPath("$.success").isTrue()
                 .responseJsonPath("$.value1").isNotEmpty()
+                .responseJsonPath("$.value1").contains("12")
         }
     }
 
