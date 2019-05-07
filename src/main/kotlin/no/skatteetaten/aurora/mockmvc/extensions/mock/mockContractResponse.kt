@@ -47,4 +47,3 @@ class ExtendedNullableBDDMyOngoingStubbing<T>(ongoingStubbing: BDDMockito.BDDMyO
     BDDMockito.BDDMyOngoingStubbing<T?> by ongoingStubbing {
     val mockResponse = content
 }
-

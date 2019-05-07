@@ -31,6 +31,9 @@ data class JsonPathEquals(val expression: String, val resultActions: ResultActio
         }
     }
 
+    fun contains(expected: String): ResultActions =
+        resultActions.andExpect(jsonPath(expression, Matchers.containsString(expected)))
+
     fun isEmpty(): ResultActions = resultActions.andExpect(jsonPath(expression).isEmpty)
     fun isNotEmpty(): ResultActions = resultActions.andExpect(jsonPath(expression).isNotEmpty)
     fun isTrue(): ResultActions = resultActions.andExpect(jsonPath(expression).value(true))
