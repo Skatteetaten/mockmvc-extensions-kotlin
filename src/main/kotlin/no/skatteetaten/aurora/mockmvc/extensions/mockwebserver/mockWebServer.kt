@@ -10,6 +10,7 @@ import okhttp3.mockwebserver.RecordedRequest
 import org.springframework.core.io.ClassPathResource
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
+import java.util.concurrent.TimeUnit
 
 private fun MockWebServer.enqueueJson(status: Int = 200, body: Any, objectMapper: ObjectMapper) {
     val json = body as? String ?: objectMapper.writeValueAsString(body)
@@ -20,8 +21,13 @@ private fun MockWebServer.enqueueJson(status: Int = 200, body: Any, objectMapper
     this.enqueue(response)
 }
 
-fun MockWebServer.execute(vararg responses: MockResponse, fn: () -> Unit): List<RecordedRequest> {
-    fun takeRequests() = (1..responses.size).toList().map { this.takeRequest() }
+fun MockWebServer.execute(
+    vararg responses: MockResponse,
+    timeoutInMs: Long = 3000,
+    fn: () -> Unit
+): List<RecordedRequest?> {
+    fun takeRequests() =
+        (1..responses.size).toList().map { this.takeRequest(timeoutInMs, TimeUnit.MILLISECONDS) }
 
     try {
         responses.forEach { this.enqueue(it) }
@@ -36,9 +42,11 @@ fun MockWebServer.execute(vararg responses: MockResponse, fn: () -> Unit): List<
 fun MockWebServer.execute(
     vararg responses: Pair<Int, Any>,
     objectMapper: ObjectMapper = TestObjectMapperConfigurer.objectMapper,
+    timeoutInMs: Long = 3000,
     fn: () -> Unit
-): List<RecordedRequest> {
-    fun takeRequests() = (1..responses.size).toList().map { this.takeRequest() }
+): List<RecordedRequest?> {
+    fun takeRequests() =
+        (1..responses.size).toList().map { this.takeRequest(timeoutInMs, TimeUnit.MILLISECONDS) }
 
     try {
         responses.forEach { this.enqueueJson(status = it.first, body = it.second, objectMapper = objectMapper) }
@@ -53,9 +61,11 @@ fun MockWebServer.execute(
 fun MockWebServer.execute(
     vararg responses: Any,
     objectMapper: ObjectMapper = TestObjectMapperConfigurer.objectMapper,
+    timeoutInMs: Long = 3000,
     fn: () -> Unit
-): List<RecordedRequest> {
-    fun takeRequests() = (1..responses.size).toList().map { this.takeRequest() }
+): List<RecordedRequest?> {
+    fun takeRequests() =
+        (1..responses.size).toList().map { this.takeRequest(timeoutInMs, TimeUnit.MILLISECONDS) }
 
     try {
         responses.forEach { this.enqueueJson(body = it, objectMapper = objectMapper) }

@@ -3,6 +3,8 @@ package no.skatteetaten.aurora.mockmvc.extensions.mockwebserver
 import assertk.Assert
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import assertk.assertions.isNotNull
+import assertk.assertions.isNull
 import assertk.assertions.support.expected
 import assertk.catch
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -47,8 +49,8 @@ class MockWebServerTest {
         }
 
         assertThat(request.size).isEqualTo(2)
-        assertThat(request.first()).hasDefaultPath()
-        assertThat(request[1]).hasDefaultPath()
+        assertThat(request.first()).isNotNull().hasDefaultPath()
+        assertThat(request[1]).isNotNull().hasDefaultPath()
     }
 
     @Test
@@ -59,8 +61,8 @@ class MockWebServerTest {
             assertThat(response.body).isEqualTo("""{"value":"test"}""")
         }
 
-        assertThat(request.first()).hasDefaultPath()
-        assertThat(request.first().bodyAsString()).isEqualTo("""{"value":"test-request-body"}""")
+        assertThat(request.first()).isNotNull().hasDefaultPath()
+        assertThat(request.first()?.bodyAsString()).isEqualTo("""{"value":"test-request-body"}""")
     }
 
     @Test
@@ -70,10 +72,10 @@ class MockWebServerTest {
             assertThat(response).isOk()
             assertThat(response.body).isEqualTo("""{"value":"test"}""")
         }
-        val body = request.first().bodyAsObject<TestObject>()
+        val body = request.first()?.bodyAsObject<TestObject>()
 
-        assertThat(request.first()).hasDefaultPath()
-        assertThat(body.value).isEqualTo("test-request-body")
+        assertThat(request.first()).isNotNull().hasDefaultPath()
+        assertThat(body?.value).isEqualTo("test-request-body")
     }
 
     @Test
@@ -88,8 +90,8 @@ class MockWebServerTest {
         }
 
         assertThat(requests.size).isEqualTo(2)
-        assertThat(requests[0]).hasDefaultPath()
-        assertThat(requests[1]).hasDefaultPath()
+        assertThat(requests[0]).isNotNull().hasDefaultPath()
+        assertThat(requests[1]).isNotNull().hasDefaultPath()
     }
 
     @Test
@@ -105,8 +107,8 @@ class MockWebServerTest {
         }
 
         assertThat(requests.size).isEqualTo(2)
-        assertThat(requests[0]).hasDefaultPath()
-        assertThat(requests[1]).hasDefaultPath()
+        assertThat(requests[0]).isNotNull().hasDefaultPath()
+        assertThat(requests[1]).isNotNull().hasDefaultPath()
     }
 
     @Test
@@ -117,7 +119,13 @@ class MockWebServerTest {
             assertThat(response.body).isEqualTo("""{"key":"test123"}""")
         }
 
-        assertThat(request.first()).hasDefaultPath()
+        assertThat(request.first()).isNotNull().hasDefaultPath()
+    }
+
+    @Test
+    fun `Response timeout from server`() {
+        val request = server.execute(responses = *arrayOf(MockResponse()), timeoutInMs = 5) {}
+        assertThat(request.first()).isNull()
     }
 
     private fun Assert<ResponseEntity<*>>.isOk() = given { request ->
