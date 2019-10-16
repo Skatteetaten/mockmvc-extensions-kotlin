@@ -3,10 +3,12 @@ package no.skatteetaten.aurora.mockmvc.extensions.mockwebserver
 import assertk.Assert
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import assertk.assertions.isFailure
+import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
+import assertk.assertions.prop
 import assertk.assertions.support.expected
-import assertk.catch
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -98,12 +100,13 @@ class MockWebServerTest {
     fun `Test execute with vararg response pairs`() {
         val requests = server.execute(200 to TestObject("test"), 404 to TestObject("test")) {
             val response1 = RestTemplate().getForEntity<String>(url.toString())
-            val exception: HttpClientErrorException =
-                catch { RestTemplate().getForEntity<String>(url.toString()) } as HttpClientErrorException
+
+            assertThat { RestTemplate().getForEntity<String>(url.toString()) }
+                .isFailure()
+                .isInstanceOf(HttpClientErrorException::class)
+                .prop(HttpClientErrorException::getStatusCode).isEqualTo(HttpStatus.NOT_FOUND)
             assertThat(response1).isOk()
-            assertThat(exception.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
             assertThat(response1.body).isEqualTo("""{"value":"test"}""")
-            assertThat(exception.responseBodyAsString).isEqualTo("""{"value":"test"}""")
         }
 
         assertThat(requests.size).isEqualTo(2)
