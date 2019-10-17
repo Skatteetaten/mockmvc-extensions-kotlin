@@ -85,4 +85,11 @@ class MockMvcDataTest {
             MockMvcData(Path("/test/test123?testing=123&test=abc"), mockk()).getSnippetName(HttpMethod.PUT)
         assertThat(snippetName).isEqualTo("put-test-test123_testing=123&test=abc")
     }
+
+    @Test
+    fun `Remove slash before query params`() {
+        val snippetName =
+            MockMvcData(Path("/test/?testing=123"), mockk()).getSnippetName(HttpMethod.GET)
+        assertThat(snippetName).isEqualTo("get-test_testing=123")
+    }
 }
