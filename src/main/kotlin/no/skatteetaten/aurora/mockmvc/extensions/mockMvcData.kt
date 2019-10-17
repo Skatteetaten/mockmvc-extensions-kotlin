@@ -57,7 +57,7 @@ data class MockMvcData(val path: Path, val results: ResultActions) : ResultActio
     }
 
     fun getSnippetName(method: HttpMethod) = method.name.toLowerCase() +
-        path.url.replace("/", "-").replace("?", "_").replace(Regex("[{}]"), "")
+        path.url.replace("/", "-").replace("?", "_").replace(Regex("[{}]"), "").removeSuffix("-")
 }
 
 class Path(

@@ -2,13 +2,12 @@ package no.skatteetaten.aurora.mockmvc.extensions
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import assertk.assertions.isFailure
 import assertk.assertions.isFalse
 import assertk.assertions.isInstanceOf
-import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import assertk.assertions.matches
-import assertk.catch
 import io.mockk.mockk
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -49,9 +48,9 @@ class MockMvcDataTest {
     @Test
     fun `Request WireMock builder for unsupported HTTP method`() {
         val mockMvcData = MockMvcData(Path("/test?key=value"), mockk())
-        val exception = catch { mockMvcData.request(HttpMethod.TRACE) }
-
-        assertThat(exception).isNotNull().isInstanceOf(IllegalArgumentException::class)
+        assertThat {
+            mockMvcData.request(HttpMethod.TRACE)
+        }.isFailure().isInstanceOf(IllegalArgumentException::class)
     }
 
     @Test
@@ -69,6 +68,12 @@ class MockMvcDataTest {
     }
 
     @Test
+    fun `Remove trailing slash from path`() {
+        val snippetName = MockMvcData(Path("/test/"), mockk()).getSnippetName(HttpMethod.GET)
+        assertThat(snippetName).isEqualTo("get-test")
+    }
+
+    @Test
     fun `Get snippet name for template path`() {
         val snippetName = MockMvcData(Path("/test/{name}/{id}"), mockk()).getSnippetName(HttpMethod.POST)
         assertThat(snippetName).isEqualTo("post-test-name-id")
@@ -76,8 +81,8 @@ class MockMvcDataTest {
 
     @Test
     fun `Get snippet name for path with query params`() {
-        val snippetName = MockMvcData(Path("/test/test123?testing=123&test=abc"), mockk()).getSnippetName(HttpMethod.PUT)
+        val snippetName =
+            MockMvcData(Path("/test/test123?testing=123&test=abc"), mockk()).getSnippetName(HttpMethod.PUT)
         assertThat(snippetName).isEqualTo("put-test-test123_testing=123&test=abc")
     }
-
 }
