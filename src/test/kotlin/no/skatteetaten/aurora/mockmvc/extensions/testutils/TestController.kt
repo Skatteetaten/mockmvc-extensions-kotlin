@@ -23,7 +23,7 @@ data class TestObject(val value1: String = "123", val value2: String = "abc", va
 data class TimeObject(val time: Instant = Instant.now())
 
 @RestController
-@RequestMapping(produces = [MediaType.APPLICATION_JSON_UTF8_VALUE])
+@RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 class TestController {
 
     @GetMapping("/test")

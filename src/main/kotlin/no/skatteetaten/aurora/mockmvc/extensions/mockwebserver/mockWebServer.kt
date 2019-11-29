@@ -1,5 +1,8 @@
 package no.skatteetaten.aurora.mockmvc.extensions.mockwebserver
 
+import assertk.Assert
+import assertk.assertThat
+import assertk.assertions.support.expected
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.convertValue
 import com.jayway.jsonpath.JsonPath
@@ -9,14 +12,41 @@ import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.springframework.core.io.ClassPathResource
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import java.util.concurrent.TimeUnit
+
+fun MockWebServer.enqueueJson(vararg responses: MockResponse) {
+    responses.forEach {
+        it.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        this.enqueue(it)
+    }
+}
+
+fun MockWebServer.assert(): Assert<List<RecordedRequest>> {
+    val requests = mutableListOf<RecordedRequest>()
+    do {
+        val request = this.takeRequest(500, TimeUnit.MILLISECONDS)?.let {
+            requests.add(it)
+        }
+    } while (request != null)
+    return assertThat(requests)
+}
+
+fun Assert<List<RecordedRequest>>.containsRequest(method: HttpMethod, path: String): Assert<List<RecordedRequest>> =
+    transform { requests ->
+        if (requests.any { it.method == method.name && it.path == path }) {
+            requests
+        } else {
+            expected("${method.name} request with $path but was $requests")
+        }
+    }
 
 private fun MockWebServer.enqueueJson(status: Int = 200, body: Any, objectMapper: ObjectMapper) {
     val json = body as? String ?: objectMapper.writeValueAsString(body)
     val response = MockResponse()
         .setResponseCode(status)
-        .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE)
+        .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
         .setBody(json)
     this.enqueue(response)
 }
@@ -80,7 +110,7 @@ fun MockWebServer.execute(
 fun MockResponse.setJsonFileAsBody(fileName: String): MockResponse {
     val classPath = ClassPathResource("/$fileName")
     val json = classPath.file.readText()
-    this.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE)
+    this.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
     return this.setBody(json)
 }
 
