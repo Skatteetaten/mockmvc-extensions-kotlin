@@ -23,10 +23,10 @@ fun MockWebServer.enqueueJson(vararg responses: MockResponse) {
     }
 }
 
-fun MockWebServer.assert(): Assert<List<RecordedRequest>> {
+fun MockWebServer.assert(timeoutInMs: Long = 500): Assert<List<RecordedRequest>> {
     val requests = mutableListOf<RecordedRequest>()
     do {
-        val request = this.takeRequest(500, TimeUnit.MILLISECONDS)?.let {
+        val request = this.takeRequest(timeoutInMs, TimeUnit.MILLISECONDS)?.let {
             requests.add(it)
         }
     } while (request != null)
