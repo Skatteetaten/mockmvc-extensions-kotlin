@@ -1,9 +1,10 @@
 #!/usr/bin/env groovy
 def config = [
+        scriptVersion  : 'v7',
+        iqOrganizationName: "Team AOS",
         credentialsId: "github",
         deployTo: 'maven-central',
         openShiftBuild: false,
-        scriptVersion : 'v6',
         javaVersion : '8',
         sonarQube: false,
         pipelineScript : 'https://git.aurora.skead.no/scm/ao/aurora-pipeline-scripts.git',

@@ -3,8 +3,11 @@ package no.skatteetaten.aurora.mockmvc.extensions.mockwebserver
 import assertk.Assert
 import assertk.assertThat
 import assertk.assertions.support.expected
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.convertValue
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.jayway.jsonpath.JsonPath
 import no.skatteetaten.aurora.mockmvc.extensions.TestObjectMapperConfigurer
 import okhttp3.mockwebserver.MockResponse
@@ -123,3 +126,18 @@ inline fun <reified T> RecordedRequest.bodyAsObject(
 }
 
 fun RecordedRequest.bodyAsString(): String = this.body.readUtf8()
+
+fun RecordedRequest.replayRequestJsonWithModification(
+    rootPath: String,
+    key: String,
+    newValue: JsonNode
+): MockResponse {
+    val ad: JsonNode = jacksonObjectMapper().readTree(this.bodyAsString())
+    (ad.at(rootPath) as ObjectNode).replace(key, newValue)
+
+    return MockResponse()
+        .setResponseCode(200)
+        .setBody(jacksonObjectMapper().writeValueAsString(ad))
+        .setHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+}
+
