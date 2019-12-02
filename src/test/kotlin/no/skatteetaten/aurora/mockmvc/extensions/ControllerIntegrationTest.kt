@@ -32,7 +32,7 @@ class ControllerIntegrationTest {
     fun `Get request with json response`() {
         mockMvc.get(path = Path("/{test-path}", "test")) {
             statusIsOk()
-                .responseHeader(HttpHeaders.CONTENT_TYPE).equals(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .responseHeader(HttpHeaders.CONTENT_TYPE).startsWith(MediaType.APPLICATION_JSON_VALUE)
                 .responseJsonPath("$.value").equalsValue("test")
                 .printResponseBody()
         }

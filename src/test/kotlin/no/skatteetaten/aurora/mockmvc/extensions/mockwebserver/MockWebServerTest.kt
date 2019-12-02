@@ -16,6 +16,7 @@ import okhttp3.mockwebserver.RecordedRequest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.client.HttpClientErrorException
@@ -34,6 +35,24 @@ class MockWebServerTest {
     @AfterEach
     fun tearDown() {
         server.shutdown()
+    }
+
+    @Test
+    fun `Enqueue json responses and assert requests`() {
+        server.enqueueJson(
+            MockResponse().setBody("test1"),
+            MockResponse().setBody("test2")
+        )
+
+        val response1 = RestTemplate().getForEntity<String>(url.toString())
+        val response2 = RestTemplate().getForEntity<String>(url.toString())
+
+        assertThat(response1.body).isEqualTo("test1")
+        assertThat(response2.body).isEqualTo("test2")
+
+        server.assert()
+            .containsRequest(HttpMethod.GET, "/")
+            .containsRequest(HttpMethod.GET, "/")
     }
 
     @Test

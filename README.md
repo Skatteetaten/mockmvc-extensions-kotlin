@@ -48,6 +48,26 @@ And to assert on response headers
 * *equals:* `statusIsOk().responseHeader(CONTENT_TYPE).equals(APPLICATION_JSON_UTF8_VALUE)`
 * *startsWith:* `statusIsOk().responseHeader(CONTENT_TYPE).startsWith(APPLICATION_JSON_VALUE)`
 
+## Custom Dispatcher DSL
+An alternate way of mocking is by using our httpMockServer dsl that uses a custom dispatcher.
+```
+val server:MockWebServer = httpMockServer(8282) {
+  rule({ path?.endsWith("sith")}) {
+    MockResponse().setBody("Darth Vader")
+  }
+  rule {
+    MockResponse().setBody("Yoda")
+  }
+}
+```
+
+This will create a MockWebServer that will evaluate all calls against the rules in the block in order. 
+The optional parameter to the rule is guard, you can also return null inside a rule to ignore that rule
+
+See the file httpMock.kt for more details. 
+
+There is a convenience method `HttpMock.clearAllHttpMocks()` for clearing up all mocks created with the DSL.
+
 ## Rest docs
 
 To generate rest docs add `@AutoConfigureRestDocs` to your unit test class.
