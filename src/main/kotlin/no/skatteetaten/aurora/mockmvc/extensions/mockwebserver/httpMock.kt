@@ -61,12 +61,10 @@ class HttpMock {
     }
 
     /*
-              Record a rule in the mock. Add an optional check as the first parameter
-
-              If the body of the rule returns null it will be ignored.
-
-              The ordering of the rules matter, the first one that matches will be returned
-             */
+    Record a rule in the mock. Add an optional check as the first parameter
+    If the body of the rule returns null it will be ignored.
+    The ordering of the rules matter, the first one that matches will be returned
+    */
     fun rule(check: MockFlag = { true }, fn: MockRule): HttpMock {
         mockRules.add(MockRules(check, fn))
         return this
