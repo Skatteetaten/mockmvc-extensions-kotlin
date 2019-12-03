@@ -19,6 +19,8 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import java.util.concurrent.TimeUnit
 
+fun responseWithBody(body: String) = MockResponse().setBody(body)
+
 fun MockWebServer.enqueueJson(vararg responses: MockResponse) {
     responses.forEach {
         it.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -141,3 +143,5 @@ fun RecordedRequest.replayRequestJsonWithModification(
         .setHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
 }
 
+val MockWebServer.url: String
+    get() = this.url("/").toString()

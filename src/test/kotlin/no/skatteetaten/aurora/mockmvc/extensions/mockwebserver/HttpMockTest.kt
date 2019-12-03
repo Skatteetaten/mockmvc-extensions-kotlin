@@ -10,12 +10,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.getForEntity
-import org.springframework.web.client.postForObject
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class HttpMocktest {
 
     val sithRule = MockRules({ path?.endsWith("/sith") }, { MockResponse().setBody("Darth Vader")})
+
     @AfterEach
     fun tearDown() {
         HttpMock.clearAllHttpMocks()
@@ -29,9 +29,8 @@ class HttpMocktest {
                 MockResponse().setBody("Yoda")
             }
         }
-        val url = server.url("/")
 
-        val response1 = RestTemplate().getForEntity<String>("$url/jedi")
+        val response1 = RestTemplate().getForEntity<String>("${server.url}/jedi")
         assertThat(response1.body).isEqualTo("Yoda")
     }
 
@@ -47,10 +46,9 @@ class HttpMocktest {
             rule(sithRule)
 
         }
-        val url = server.url("/")
 
-        val response1 = RestTemplate().getForEntity<String>("$url/jedi")
-        val response2 = RestTemplate().getForEntity<String>("$url/sith")
+        val response1 = RestTemplate().getForEntity<String>("${server.url}/jedi")
+        val response2 = RestTemplate().getForEntity<String>("${server.url}/sith")
         assertThat(response1.body).isEqualTo("Yoda")
         assertThat(response2.body).isEqualTo("Darth Vader")
     }
@@ -58,7 +56,7 @@ class HttpMocktest {
     @Test
     fun `replay json test`() {
 
-        val server = httpMockServer(8383) {
+        val server = httpMockServer("8383") {
             rule {
                 replayRequestJsonWithModification(
                     rootPath = "/result",

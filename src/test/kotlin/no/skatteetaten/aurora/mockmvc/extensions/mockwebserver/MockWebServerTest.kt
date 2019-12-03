@@ -30,7 +30,6 @@ data class TestObject(val value: String)
 class MockWebServerTest {
 
     private val server = MockWebServer()
-    private val url = server.url("/")
 
     @AfterEach
     fun tearDown() {
@@ -40,12 +39,12 @@ class MockWebServerTest {
     @Test
     fun `Enqueue json responses and assert requests`() {
         server.enqueueJson(
-            MockResponse().setBody("test1"),
-            MockResponse().setBody("test2")
+            responseWithBody("test1"),
+            responseWithBody("test2")
         )
 
-        val response1 = RestTemplate().getForEntity<String>(url.toString())
-        val response2 = RestTemplate().getForEntity<String>(url.toString())
+        val response1 = RestTemplate().getForEntity<String>(server.url)
+        val response2 = RestTemplate().getForEntity<String>(server.url)
 
         assertThat(response1.body).isEqualTo("test1")
         assertThat(response2.body).isEqualTo("test2")
@@ -60,8 +59,8 @@ class MockWebServerTest {
         val mockResponse = MockResponse().setBody("test")
 
         val request = server.execute(mockResponse, mockResponse) {
-            val response1 = RestTemplate().getForEntity<String>(url.toString())
-            val response2 = RestTemplate().getForEntity<String>(url.toString())
+            val response1 = RestTemplate().getForEntity<String>(server.url)
+            val response2 = RestTemplate().getForEntity<String>(server.url)
 
             assertThat(response1).isOk()
             assertThat(response1.body).isEqualTo("test")
@@ -77,7 +76,7 @@ class MockWebServerTest {
     @Test
     fun `Test execute with status and response object`() {
         val request = server.execute(201 to TestObject("test"), objectMapper = jacksonObjectMapper()) {
-            val response = RestTemplate().postForEntity<String>(url.toString(), TestObject("test-request-body"))
+            val response = RestTemplate().postForEntity<String>(server.url, TestObject("test-request-body"))
             assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
             assertThat(response.body).isEqualTo("""{"value":"test"}""")
         }
@@ -89,7 +88,7 @@ class MockWebServerTest {
     @Test
     fun `Test execute with request and response object`() {
         val request = server.execute(TestObject("test"), objectMapper = jacksonObjectMapper()) {
-            val response = RestTemplate().postForEntity<String>(url.toString(), TestObject("test-request-body"))
+            val response = RestTemplate().postForEntity<String>(server.url, TestObject("test-request-body"))
             assertThat(response).isOk()
             assertThat(response.body).isEqualTo("""{"value":"test"}""")
         }
@@ -102,8 +101,8 @@ class MockWebServerTest {
     @Test
     fun `Test execute with vararg response objects`() {
         val requests = server.execute(TestObject("test"), TestObject("test")) {
-            val response1 = RestTemplate().getForEntity<String>(url.toString())
-            val response2 = RestTemplate().getForEntity<String>(url.toString())
+            val response1 = RestTemplate().getForEntity<String>(server.url)
+            val response2 = RestTemplate().getForEntity<String>(server.url)
             assertThat(response1).isOk()
             assertThat(response2).isOk()
             assertThat(response1.body).isEqualTo("""{"value":"test"}""")
@@ -118,9 +117,9 @@ class MockWebServerTest {
     @Test
     fun `Test execute with vararg response pairs`() {
         val requests = server.execute(200 to TestObject("test"), 404 to TestObject("test")) {
-            val response1 = RestTemplate().getForEntity<String>(url.toString())
+            val response1 = RestTemplate().getForEntity<String>(server.url)
 
-            assertThat { RestTemplate().getForEntity<String>(url.toString()) }
+            assertThat { RestTemplate().getForEntity<String>(server.url) }
                 .isFailure()
                 .isInstanceOf(HttpClientErrorException::class)
                 .prop(HttpClientErrorException::getStatusCode).isEqualTo(HttpStatus.NOT_FOUND)
@@ -136,7 +135,7 @@ class MockWebServerTest {
     @Test
     fun `Set json file as body`() {
         val request = server.execute(MockResponse().setJsonFileAsBody("test.json")) {
-            val response = RestTemplate().getForEntity<String>(url.toString())
+            val response = RestTemplate().getForEntity<String>(server.url)
             assertThat(response).isOk()
             assertThat(response.body).isEqualTo("""{"key":"test123"}""")
         }
