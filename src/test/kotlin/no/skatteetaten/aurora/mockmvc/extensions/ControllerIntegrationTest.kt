@@ -56,6 +56,7 @@ class ControllerIntegrationTest {
         ) {
             statusIsOk()
                 .responseJsonPath("$.key1").equalsValue("123")
+                .responseJsonPath("$.key1").equalsValue(123, Int::class.java)
                 .responseJsonPath("$.key2").isEmpty()
                 .responseJsonPath("$.success").isFalse()
         }
