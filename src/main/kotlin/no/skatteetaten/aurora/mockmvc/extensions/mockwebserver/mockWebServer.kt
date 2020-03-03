@@ -145,3 +145,14 @@ fun RecordedRequest.replayRequestJsonWithModification(
 
 val MockWebServer.url: String
     get() = this.url("/").toString()
+
+fun jsonResponse(body: Any? = null): MockResponse {
+    val response = MockResponse().setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+    return body?.let {
+        if (it is String) {
+            response.setBody(it)
+        } else {
+            response.setBody(jacksonObjectMapper().writeValueAsString(body))
+        }
+    } ?: response
+}

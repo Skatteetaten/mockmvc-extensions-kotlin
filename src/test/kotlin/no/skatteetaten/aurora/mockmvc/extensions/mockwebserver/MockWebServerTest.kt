@@ -145,7 +145,7 @@ class MockWebServerTest {
 
     @Test
     fun `Response timeout from server`() {
-        val request = server.execute(responses = *arrayOf(MockResponse()), timeoutInMs = 5) {}
+        val request = server.execute(responses = *arrayOf(jsonResponse()), timeoutInMs = 5) {}
         assertThat(request.first()).isNull()
     }
 

@@ -20,7 +20,7 @@ class HttpMock {
 
     val mockRules: MutableList<MockRules> = mutableListOf()
 
-    fun start(port: Int): MockWebServer {
+    fun start(port: Int? = null): MockWebServer {
 
         return MockWebServer().apply {
             dispatcher = object : Dispatcher() {
@@ -43,7 +43,7 @@ class HttpMock {
                     return matchingRule
                 }
             }
-            start(port)
+            port?.let { start(port) } ?: start()
         }
     }
 
@@ -93,3 +93,10 @@ fun httpMockServer(port: Int, block: HttpMock.() -> Unit = {}): MockWebServer {
     return server
 }
 
+fun httpMockServer(block: HttpMock.() -> Unit = {}): MockWebServer {
+    val instance = HttpMock()
+    instance.block()
+    val server = instance.start()
+    HttpMock.httpMocks.add(server)
+    return server
+}

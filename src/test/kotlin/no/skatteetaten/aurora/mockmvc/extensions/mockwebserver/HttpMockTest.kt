@@ -35,9 +35,9 @@ class HttpMocktest {
     }
 
     @Test
-    fun `assert two rules `() {
+    fun `assert two rules`() {
 
-        val server = httpMockServer(8181) {
+        val server = httpMockServer("8181") {
 
             rule({ path?.endsWith("jedi")}) {
                 MockResponse().setBody("Yoda")
@@ -56,7 +56,7 @@ class HttpMocktest {
     @Test
     fun `replay json test`() {
 
-        val server = httpMockServer("8383") {
+        val server = httpMockServer {
             rule {
                 replayRequestJsonWithModification(
                     rootPath = "/result",
@@ -74,6 +74,5 @@ class HttpMocktest {
         }""".trimMargin()
         val result:JsonNode? = RestTemplate().postForObject<JsonNode>(server.url("/test").toString(), body, JsonNode::class.java)
         assertThat(result?.at("/result/status")?.textValue()).isEqualTo("Success")
-
     }
 }
