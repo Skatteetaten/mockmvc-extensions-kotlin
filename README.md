@@ -68,8 +68,7 @@ See the file httpMock.kt for more details.
 
 There is a convenience method `HttpMock.clearAllHttpMocks()` for clearing up all mocks created with the DSL.
 
-It is also possible to initialize a `MockWebServer` that is not started,
-where it is possible to add rules after it is created.
+It is also possible to initialize a `MockWebServer` that is not started, where you can add rules after it is created.
 
 ```
 val httpMock = initHttpMockServer {
@@ -84,6 +83,7 @@ httpMock.rule({ path?.endsWith("jedi") }) {
 httpMock.executeRules {
     val response1 = RestTemplate().getForEntity<String>("${it.url}/jedi")
     val response2 = RestTemplate().getForEntity<String>("${it.url}/sith")
+    ...
 }
 ```
 
