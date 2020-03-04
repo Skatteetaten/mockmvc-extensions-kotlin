@@ -19,31 +19,39 @@ class HttpMock {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     val mockRules: MutableList<MockRules> = mutableListOf()
+    var server: MockWebServer? = null
 
-    fun start(port: Int? = null): MockWebServer {
+    fun start(port: Int? = null) = MockWebServer().apply {
+        dispatcher = createDispatcher()
+        port?.let { start(port) } ?: start()
+    }.also {
+        server = it
+    }
 
-        return MockWebServer().apply {
-            dispatcher = object : Dispatcher() {
-                override fun dispatch(request: RecordedRequest): MockResponse {
-                    val matchingRule = mockRules.asSequence().mapNotNull {
-                        // If there is a check and it returns true then run the request.
-                        // Note that if there check here returns null it will not fire, this makes it very usable
-                        if (it.check(request) == true) {
+    fun init() = MockWebServer().apply {
+        dispatcher = createDispatcher()
+    }.also {
+        server = it
+    }
 
-                            //If the fn functino returns null the rule will be ignored and the next rule will be evaluated
-                            it.fn(request)
-                        } else null
-                    }.firstOrNull()
+    private fun createDispatcher() = object : Dispatcher() {
+        override fun dispatch(request: RecordedRequest): MockResponse {
+            val matchingRule = mockRules.asSequence().mapNotNull {
+                // If there is a check and it returns true then run the request.
+                // Note that if there check here returns null it will not fire, this makes it very usable
+                if (it.check(request) == true) {
 
-                    if (matchingRule == null) {
-                        logger.debug("No matching rules matches request=;request")
-                        throw IllegalArgumentException("No function matches request=$request")
-                    }
+                    //If the fn function returns null the rule will be ignored and the next rule will be evaluated
+                    it.fn(request)
+                } else null
+            }.firstOrNull()
 
-                    return matchingRule
-                }
+            if (matchingRule == null) {
+                logger.debug("No matching rules matches request=;request")
+                throw IllegalArgumentException("No function matches request=$request")
             }
-            port?.let { start(port) } ?: start()
+
+            return matchingRule
         }
     }
 
@@ -70,12 +78,21 @@ class HttpMock {
         return this
     }
 
+    fun executeRules(port: Int? = null, fn: (server: MockWebServer) -> Unit) {
+        port?.let { server!!.start(port) } ?: server!!.start()
+        fn(server!!)
+        clearAllHttpMocks()
+    }
+
     companion object {
         var httpMocks: MutableList<MockWebServer> = mutableListOf()
 
         fun clearAllHttpMocks() {
             httpMocks.forEach {
-                it.shutdown()
+                try {
+                    it.shutdown()
+                } catch (ignored: Throwable) {
+                }
             }
             httpMocks = mutableListOf()
         }
@@ -99,4 +116,12 @@ fun httpMockServer(block: HttpMock.() -> Unit = {}): MockWebServer {
     val server = instance.start()
     HttpMock.httpMocks.add(server)
     return server
+}
+
+fun initHttpMockServer(block: HttpMock.() -> Unit = {}): HttpMock {
+    val instance = HttpMock()
+    instance.block()
+    val server = instance.init()
+    HttpMock.httpMocks.add(server)
+    return instance
 }
