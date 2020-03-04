@@ -18,10 +18,9 @@ fun ResultActions.statusIsOk(): ResultActions =
     this.andExpect(status().isOk)
 
 data class JsonPathEquals(val expression: String, val resultActions: ResultActions) {
-    fun equalsValue(value: Any): ResultActions = resultActions.andExpect(jsonPath(expression, Matchers.equalTo(value)))
 
-    fun <T> equalsValue(value: T, targetType: Class<T>): ResultActions =
-        resultActions.andExpect(jsonPath(expression, Matchers.equalTo<T>(value), targetType))
+    inline fun <reified T> equalsValue(value: T): ResultActions =
+        resultActions.andExpect(jsonPath(expression, Matchers.equalTo<T>(value), T::class.java))
 
     fun equalsObject(
         expected: Any,
