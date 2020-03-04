@@ -69,6 +69,8 @@ See the file httpMock.kt for more details.
 There is a convenience method `HttpMock.clearAllHttpMocks()` for clearing up all mocks created with the DSL.
 
 It is also possible to initialize a `MockWebServer` that is not started, where you can add rules after it is created.
+If you need to stop the server and clear the HttpMocks, for instance to avoid it bleeding into other tests,
+use the `executeRulesAndClearMocks` function or manually call `HttpMock.clearAllHttpMocks()`.
 
 ```
 val httpMock = initHttpMockServer {

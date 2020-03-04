@@ -78,8 +78,24 @@ class HttpMock {
         return this
     }
 
+    /*
+    Executes the added rules.
+    It is important to note that this function will not clear the list of HttpMocks.
+     */
     fun executeRules(port: Int? = null, fn: (server: MockWebServer) -> Unit) {
-        port?.let { server!!.start(port) } ?: server!!.start()
+        kotlin.runCatching {
+            port?.let { server!!.start(port) } ?: server!!.start()
+        }
+        fn(server!!)
+    }
+
+    /*
+    Executes the added rules and clears the HttpMocks.
+     */
+    fun executeRulesAndClearMocks(port: Int? = null, fn: (server: MockWebServer) -> Unit) {
+        kotlin.runCatching {
+            port?.let { server!!.start(port) } ?: server!!.start()
+        }
         fn(server!!)
         clearAllHttpMocks()
     }
@@ -92,6 +108,7 @@ class HttpMock {
                 try {
                     it.shutdown()
                 } catch (ignored: Throwable) {
+                    println(ignored.message)
                 }
             }
             httpMocks = mutableListOf()

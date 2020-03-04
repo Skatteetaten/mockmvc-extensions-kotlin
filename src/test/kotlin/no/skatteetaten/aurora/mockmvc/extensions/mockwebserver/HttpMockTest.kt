@@ -85,6 +85,16 @@ class HttpMocktest {
         }
 
         httpMock.executeRules {
+            val response = RestTemplate().getForEntity<String>("${it.url}/jedi")
+            assertThat(response.body).isEqualTo("Yoda")
+        }
+
+        httpMock.executeRules {
+            val response = RestTemplate().getForEntity<String>("${it.url}/sith")
+            assertThat(response.body).isEqualTo("Darth Vader")
+        }
+
+        httpMock.executeRulesAndClearMocks {
             val response1 = RestTemplate().getForEntity<String>("${it.url}/jedi")
             val response2 = RestTemplate().getForEntity<String>("${it.url}/sith")
             assertThat(response1.body).isEqualTo("Yoda")
