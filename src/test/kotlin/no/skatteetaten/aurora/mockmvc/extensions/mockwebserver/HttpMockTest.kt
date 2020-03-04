@@ -14,7 +14,7 @@ import org.springframework.web.client.getForEntity
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class HttpMocktest {
 
-    val sithRule = MockRules({ path?.endsWith("/sith") }, { MockResponse().setBody("Darth Vader")})
+    val sithRule = MockRules({ path?.endsWith("/sith") }, { MockResponse().setBody("Darth Vader") })
 
     @AfterEach
     fun tearDown() {
@@ -23,7 +23,6 @@ class HttpMocktest {
 
     @Test
     fun `assert single rule`() {
-
         val server = httpMockServer(8282) {
             rule {
                 MockResponse().setBody("Yoda")
@@ -36,10 +35,9 @@ class HttpMocktest {
 
     @Test
     fun `assert two rules`() {
-
         val server = httpMockServer("8181") {
 
-            rule({ path?.endsWith("jedi")}) {
+            rule({ path?.endsWith("jedi") }) {
                 MockResponse().setBody("Yoda")
             }
 
@@ -55,7 +53,6 @@ class HttpMocktest {
 
     @Test
     fun `replay json test`() {
-
         val server = httpMockServer {
             rule {
                 replayRequestJsonWithModification(
@@ -66,13 +63,42 @@ class HttpMocktest {
             }
         }
 
-
         val body = """{
            "result" : {
               "status" : "Pending"
            }
         }""".trimMargin()
-        val result:JsonNode? = RestTemplate().postForObject<JsonNode>(server.url("/test").toString(), body, JsonNode::class.java)
+        val result: JsonNode? =
+            RestTemplate().postForObject<JsonNode>(server.url("/test").toString(), body, JsonNode::class.java)
         assertThat(result?.at("/result/status")?.textValue()).isEqualTo("Success")
+    }
+
+    @Test
+    fun `Init httpMockServer and add rule`() {
+        val httpMock = initHttpMockServer {
+            rule({ path?.endsWith("sith")}) {
+                MockResponse().setBody("Darth Vader")
+            }
+        }
+        httpMock.rule({ path?.endsWith("jedi") }) {
+            MockResponse().setBody("Yoda")
+        }
+
+        httpMock.executeRules {
+            val response = RestTemplate().getForEntity<String>("${it.url}/jedi")
+            assertThat(response.body).isEqualTo("Yoda")
+        }
+
+        httpMock.executeRules {
+            val response = RestTemplate().getForEntity<String>("${it.url}/sith")
+            assertThat(response.body).isEqualTo("Darth Vader")
+        }
+
+        httpMock.executeRulesAndClearMocks {
+            val response1 = RestTemplate().getForEntity<String>("${it.url}/jedi")
+            val response2 = RestTemplate().getForEntity<String>("${it.url}/sith")
+            assertThat(response1.body).isEqualTo("Yoda")
+            assertThat(response2.body).isEqualTo("Darth Vader")
+        }
     }
 }

@@ -68,6 +68,27 @@ See the file httpMock.kt for more details.
 
 There is a convenience method `HttpMock.clearAllHttpMocks()` for clearing up all mocks created with the DSL.
 
+It is also possible to initialize a `MockWebServer` that is not started, where you can add rules after it is created.
+If you need to stop the server and clear the HttpMocks, for instance to avoid it bleeding into other tests,
+use the `executeRulesAndClearMocks` function or manually call `HttpMock.clearAllHttpMocks()`.
+
+```
+val httpMock = initHttpMockServer {
+    rule({ path?.endsWith("sith")}) {
+        MockResponse().setBody("Darth Vader")
+    }
+}
+httpMock.rule({ path?.endsWith("jedi") }) {
+    MockResponse().setBody("Yoda")
+}
+
+httpMock.executeRules {
+    val response1 = RestTemplate().getForEntity<String>("${it.url}/jedi")
+    val response2 = RestTemplate().getForEntity<String>("${it.url}/sith")
+    ...
+}
+```
+
 ## Rest docs
 
 To generate rest docs add `@AutoConfigureRestDocs` to your unit test class.
