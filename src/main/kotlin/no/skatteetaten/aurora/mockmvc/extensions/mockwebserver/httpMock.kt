@@ -105,10 +105,8 @@ class HttpMock {
 
         fun clearAllHttpMocks() {
             httpMocks.forEach {
-                try {
+                kotlin.runCatching {
                     it.shutdown()
-                } catch (ignored: Throwable) {
-                    println(ignored.message)
                 }
             }
             httpMocks = mutableListOf()
