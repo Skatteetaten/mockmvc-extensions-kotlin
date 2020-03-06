@@ -50,7 +50,7 @@ class HttpMock {
             }.firstOrNull()
 
             if (matchingRule == null) {
-                logger.debug("No matching rules matches request=;request")
+                logger.debug("No matching rules matches request=$request")
                 throw IllegalArgumentException("No function matches request=$request")
             }
 
