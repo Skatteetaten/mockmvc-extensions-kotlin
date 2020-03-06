@@ -1,10 +1,10 @@
 package no.skatteetaten.aurora.mockmvc.extensions.mockwebserver
 
+import mu.KotlinLogging
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
-import org.slf4j.LoggerFactory
 
 typealias MockRule = RecordedRequest.() -> MockResponse?
 typealias MockFlag = RecordedRequest.() -> Boolean?
@@ -14,9 +14,9 @@ data class MockRules(
     val fn: MockRule
 )
 
-class HttpMock {
+private val logger = KotlinLogging.logger {}
 
-    private val logger = LoggerFactory.getLogger(this::class.java)
+class HttpMock {
 
     val mockRules: MutableList<MockRules> = mutableListOf()
     var server: MockWebServer? = null
@@ -36,6 +36,9 @@ class HttpMock {
 
     private fun createDispatcher() = object : Dispatcher() {
         override fun dispatch(request: RecordedRequest): MockResponse {
+            logger.trace {
+                "Dispatcher called for ${request.path}, mockRules size: ${mockRules.size}"
+            }
             val matchingRule = mockRules.asSequence().mapNotNull {
                 // If there is a check and it returns true then run the request.
                 // Note that if there check here returns null it will not fire, this makes it very usable

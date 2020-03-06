@@ -2,6 +2,8 @@ package no.skatteetaten.aurora.mockmvc.extensions.mockwebserver
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import assertk.assertions.isFailure
+import assertk.assertions.messageContains
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.TextNode
 import okhttp3.mockwebserver.MockResponse
@@ -36,7 +38,6 @@ class HttpMocktest {
     @Test
     fun `assert two rules`() {
         val server = httpMockServer("8181") {
-
             rule({ path?.endsWith("jedi") }) {
                 MockResponse().setBody("Yoda")
             }
@@ -76,7 +77,7 @@ class HttpMocktest {
     @Test
     fun `Init httpMockServer and add rule`() {
         val httpMock = initHttpMockServer {
-            rule({ path?.endsWith("sith")}) {
+            rule({ path?.endsWith("sith") }) {
                 MockResponse().setBody("Darth Vader")
             }
         }
@@ -100,5 +101,22 @@ class HttpMocktest {
             assertThat(response1.body).isEqualTo("Yoda")
             assertThat(response2.body).isEqualTo("Darth Vader")
         }
+    }
+
+    @Test
+    fun `Multiple different rules`() {
+        val server = httpMockServer(8283) {
+            rule({ path?.endsWith("sith") }) {
+                MockResponse().setResponseCode(404)
+            }
+
+            rule({ path?.endsWith("jedi") }) {
+                MockResponse().setBody("Yoda")
+            }
+        }
+
+        assertThat { RestTemplate().getForEntity<String>("${server.url}/sith") }.isFailure().messageContains("404")
+        val response = RestTemplate().getForEntity<String>("${server.url}/jedi")
+        assertThat(response.body).isEqualTo("Yoda")
     }
 }
