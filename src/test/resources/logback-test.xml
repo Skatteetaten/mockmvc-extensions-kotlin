@@ -3,4 +3,5 @@
   <include resource="org/springframework/boot/logging/logback/base.xml" />
   <logger name="org.springframework" level="INFO"/>
   <logger name="io.mockk" level="INFO"/>
+  <logger name="no.skatteetaten" level="DEBUG"/>
 </configuration>

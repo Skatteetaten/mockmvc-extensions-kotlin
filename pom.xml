@@ -211,18 +211,6 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
 
@@ -287,16 +275,6 @@
                 </goals>
                 <configuration>
                   <classifier>javadoc</classifier>
-                </configuration>
-              </execution>
-              <execution>
-                <id>sources-jar</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
-                <configuration>
-                  <classifier>sources</classifier>
                 </configuration>
               </execution>
             </executions>
