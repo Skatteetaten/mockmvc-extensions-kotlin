@@ -58,6 +58,16 @@ class HttpMock {
         }
     }
 
+    fun rulePathEndsWith(endsWith: String, fn: MockRule): HttpMock {
+        mockRules.add(MockRules({ path?.endsWith(endsWith) }, fn))
+        return this
+    }
+
+    fun rulePathContains(contains: String, fn: MockRule): HttpMock {
+        mockRules.add(MockRules({ path?.contains(contains) }, fn))
+        return this
+    }
+
     fun rule(r: MockRules): HttpMock {
         mockRules.add(r)
         return this

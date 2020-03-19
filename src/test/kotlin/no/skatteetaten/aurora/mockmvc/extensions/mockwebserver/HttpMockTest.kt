@@ -119,4 +119,22 @@ class HttpMocktest {
         val response = RestTemplate().getForEntity<String>("${server.url}/jedi")
         assertThat(response.body).isEqualTo("Yoda")
     }
+
+    @Test
+    fun `Test rule path endsWith and contains`() {
+        val server = httpMockServer {
+            rulePathContains("sith") {
+                MockResponse().setBody("Darth Vader")
+            }
+
+            rulePathEndsWith("jedi") {
+                MockResponse().setBody("Yoda")
+            }
+        }
+
+        val response1 = RestTemplate().getForEntity<String>("${server.url}/jedi")
+        val response2 = RestTemplate().getForEntity<String>("${server.url}/sith")
+        assertThat(response1.body).isEqualTo("Yoda")
+        assertThat(response2.body).isEqualTo("Darth Vader")
+    }
 }
