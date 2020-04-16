@@ -11,7 +11,8 @@ typealias MockFlag = RecordedRequest.() -> Boolean?
 
 data class MockRules(
     val check: MockFlag,
-    val fn: MockRule
+    val fn: MockRule,
+    val id: String? = null
 )
 
 private val logger = KotlinLogging.logger {}
@@ -59,12 +60,12 @@ class HttpMock {
     }
 
     fun rulePathEndsWith(endsWith: String, fn: MockRule): HttpMock {
-        mockRules.add(MockRules({ path?.endsWith(endsWith) }, fn))
+        mockRules.add(MockRules({ path?.endsWith(endsWith) }, fn, endsWith))
         return this
     }
 
     fun rulePathContains(contains: String, fn: MockRule): HttpMock {
-        mockRules.add(MockRules({ path?.contains(contains) }, fn))
+        mockRules.add(MockRules({ path?.contains(contains) }, fn, contains))
         return this
     }
 
@@ -88,6 +89,11 @@ class HttpMock {
     */
     fun rule(check: MockFlag = { true }, fn: MockRule): HttpMock {
         mockRules.add(MockRules(check, fn))
+        return this
+    }
+
+    fun rule(check: MockFlag = { true }, id: String, fn: MockRule): HttpMock {
+        mockRules.add(MockRules(check, fn, id))
         return this
     }
 

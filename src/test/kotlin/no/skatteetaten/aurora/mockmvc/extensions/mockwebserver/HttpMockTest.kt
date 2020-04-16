@@ -3,6 +3,7 @@ package no.skatteetaten.aurora.mockmvc.extensions.mockwebserver
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFailure
+import assertk.assertions.isNotNull
 import assertk.assertions.messageContains
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.TextNode
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.getForEntity
+import org.springframework.web.client.postForObject
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class HttpMocktest {
@@ -69,8 +71,7 @@ class HttpMocktest {
               "status" : "Pending"
            }
         }""".trimMargin()
-        val result: JsonNode? =
-            RestTemplate().postForObject<JsonNode>(server.url("/test").toString(), body, JsonNode::class.java)
+        val result: JsonNode? = RestTemplate().postForObject<JsonNode>(server.url("/test").toString(), body)
         assertThat(result?.at("/result/status")?.textValue()).isEqualTo("Success")
     }
 
@@ -136,5 +137,23 @@ class HttpMocktest {
         val response2 = RestTemplate().getForEntity<String>("${server.url}/sith")
         assertThat(response1.body).isEqualTo("Yoda")
         assertThat(response2.body).isEqualTo("Darth Vader")
+    }
+
+    @Test
+    fun `Find rule by identifier`() {
+        val server = initHttpMockServer {
+            rule({ path?.endsWith("sith") }, "sith") {
+                MockResponse().setBody("Darth Vader")
+            }
+
+            rulePathEndsWith("jedi") {
+                MockResponse().setBody("Yoda")
+            }
+        }
+
+        val rule1 = server.mockRules.find { it.id == "sith" }
+        val rule2 = server.mockRules.find { it.id == "jedi" }
+        assertThat(rule1?.id).isNotNull().isEqualTo("sith")
+        assertThat(rule2?.id).isNotNull().isEqualTo("jedi")
     }
 }
