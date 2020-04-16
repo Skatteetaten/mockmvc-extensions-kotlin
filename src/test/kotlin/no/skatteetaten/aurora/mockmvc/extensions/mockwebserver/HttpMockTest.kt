@@ -1,9 +1,9 @@
 package no.skatteetaten.aurora.mockmvc.extensions.mockwebserver
 
 import assertk.assertThat
+import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFailure
-import assertk.assertions.isNotNull
 import assertk.assertions.messageContains
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.TextNode
@@ -11,6 +11,7 @@ import okhttp3.mockwebserver.MockResponse
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.springframework.util.SocketUtils
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.getForEntity
 import org.springframework.web.client.postForObject
@@ -71,7 +72,8 @@ class HttpMocktest {
               "status" : "Pending"
            }
         }""".trimMargin()
-        val result: JsonNode? = RestTemplate().postForObject<JsonNode>(server.url("/test").toString(), body)
+        val result: JsonNode? =
+            RestTemplate().postForObject<JsonNode>(server.url("/test").toString(), body)
         assertThat(result?.at("/result/status")?.textValue()).isEqualTo("Success")
     }
 
@@ -140,20 +142,32 @@ class HttpMocktest {
     }
 
     @Test
-    fun `Find rule by identifier`() {
+    fun `Add rule after server has been created`() {
         val server = initHttpMockServer {
-            rule({ path?.endsWith("sith") }, "sith") {
+            rulePathContains("sith") {
                 MockResponse().setBody("Darth Vader")
             }
+        }
+        server.mockRules.add(MockRules({ path?.endsWith("jedi") }, { MockResponse().setBody("Yoda") }, "123"))
 
+        val mockServer = server.start(SocketUtils.findAvailableTcpPort())
+        val response = RestTemplate().getForEntity<String>("${mockServer.url}/jedi")
+        mockServer.shutdown()
+
+        assertThat(response.body).isEqualTo("Yoda")
+        assertThat(server.mockRules).hasSize(2)
+    }
+
+    @Test
+    fun `Remove specific rule`() {
+        val server = initHttpMockServer {
             rulePathEndsWith("jedi") {
                 MockResponse().setBody("Yoda")
             }
         }
 
-        val rule1 = server.mockRules.find { it.id == "sith" }
-        val rule2 = server.mockRules.find { it.id == "jedi" }
-        assertThat(rule1?.id).isNotNull().isEqualTo("sith")
-        assertThat(rule2?.id).isNotNull().isEqualTo("jedi")
+        val rule = server.removeRule("jedi")
+        assertThat(server.mockRules).hasSize(0)
+        assertThat(rule?.id).isEqualTo("jedi")
     }
 }

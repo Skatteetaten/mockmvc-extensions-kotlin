@@ -119,6 +119,11 @@ class HttpMock {
         clearAllHttpMocks()
     }
 
+    fun removeRule(id: String) = mockRules.find { it.id == id }?.also {
+        mockRules.remove(it)
+        return it
+    }
+
     companion object {
         var httpMocks: MutableList<MockWebServer> = mutableListOf()
 
