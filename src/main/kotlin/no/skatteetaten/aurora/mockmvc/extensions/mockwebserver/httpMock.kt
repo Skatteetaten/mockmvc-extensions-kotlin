@@ -124,6 +124,12 @@ class HttpMock {
         return it
     }
 
+    fun updateRule(id: String, fn: MockRule) {
+        removeRule(id)?.let {
+            mockRules.add(it.copy(fn = fn))
+        } ?: throw IllegalArgumentException("No rule with id $id was found")
+    }
+
     companion object {
         var httpMocks: MutableList<MockWebServer> = mutableListOf()
 

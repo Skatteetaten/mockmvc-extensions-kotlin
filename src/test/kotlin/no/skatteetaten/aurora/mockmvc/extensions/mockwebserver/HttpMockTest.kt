@@ -170,4 +170,37 @@ class HttpMocktest {
         assertThat(server.mockRules).hasSize(0)
         assertThat(rule?.id).isEqualTo("jedi")
     }
+
+    @Test
+    fun `Update rule`() {
+        val server = initHttpMockServer {
+            rulePathEndsWith("jedi") {
+                MockResponse().setBody("Yoda")
+            }
+        }
+
+        server.updateRule("jedi") {
+            MockResponse().setBody("Obi-Wan Kenobi")
+        }
+
+        val mockServer = server.start(SocketUtils.findAvailableTcpPort())
+
+        val response = RestTemplate().getForEntity<String>("${mockServer.url}/jedi")
+        assertThat(response.body).isEqualTo("Obi-Wan Kenobi")
+    }
+
+    @Test
+    fun `Throw exception when updating rule id that does not exist`() {
+        val server = initHttpMockServer {
+            rulePathEndsWith("jedi") {
+                MockResponse().setBody("Yoda")
+            }
+        }
+
+        assertThat {
+            server.updateRule("non-existing-rule-id") {
+                MockResponse()
+            }
+        }.isFailure().messageContains("No rule with id")
+    }
 }
