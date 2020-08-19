@@ -1,9 +1,12 @@
 package no.skatteetaten.aurora.mockmvc.extensions
 
 import assertk.assertThat
+import assertk.assertions.isEqualTo
 import assertk.assertions.isTrue
+import com.fasterxml.jackson.module.kotlin.readValue
 import no.skatteetaten.aurora.mockmvc.extensions.testutils.TestController
 import no.skatteetaten.aurora.mockmvc.extensions.testutils.TestObject
+import no.skatteetaten.aurora.mockmvc.extensions.testutils.customObjectMapper
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -49,7 +52,7 @@ class ControllerIntegrationTest {
 
     @Test
     fun `Post request with request object`() {
-        mockMvc.post(
+        val result = mockMvc.post(
             path = Path("/test-with-request-object"),
             headers = HttpHeaders().contentTypeJson(),
             body = TestObject(value1 = "123", value2 = "", success = false)
@@ -60,6 +63,9 @@ class ControllerIntegrationTest {
                 .responseJsonPath("$.key2").isEmpty()
                 .responseJsonPath("$.success").isFalse()
         }
+
+        val resultMap = customObjectMapper().readValue<Map<String, String>>(result.response.contentAsByteArray)
+        assertThat(resultMap["key1"]).isEqualTo("123")
     }
 
     @Test
