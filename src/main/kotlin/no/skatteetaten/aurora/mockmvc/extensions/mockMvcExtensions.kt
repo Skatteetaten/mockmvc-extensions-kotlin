@@ -2,10 +2,12 @@ package no.skatteetaten.aurora.mockmvc.extensions
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.MvcResult
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 
@@ -72,7 +74,7 @@ private fun MockMvc.execute(
     path: Path,
     fn: (mockMvcData: MockMvcData) -> Unit,
     docsIdentifier: String?
-) {
+): MvcResult {
     val builder = MockMvcRequestBuilders
         .request(method, path.url, *path.vars)
         .addHeaders(headers)
@@ -82,8 +84,9 @@ private fun MockMvc.execute(
     val mock = MockMvcData(path, resultActions)
     fn(mock)
 
-    mock.setupWireMock(headers, method)
+    return mock.setupWireMock(headers, method)
         .addDocumentation(method, docsIdentifier)
+        .andReturn()
 }
 
 private fun MockHttpServletRequestBuilder.addHeaders(headers: HttpHeaders?) =
