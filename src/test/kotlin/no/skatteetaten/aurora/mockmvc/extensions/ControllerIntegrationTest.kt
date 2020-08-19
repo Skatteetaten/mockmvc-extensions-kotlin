@@ -123,4 +123,11 @@ class ControllerIntegrationTest {
             statusIsOk().responseJsonPath("$.value").equalsValue("latest.properties")
         }
     }
+
+    @Test
+    fun `Get request with request params`() {
+        mockMvc.get(Path("/test-with-request-params?test=test123")) {
+            statusIsOk().printResponseBody()
+        }
+    }
 }

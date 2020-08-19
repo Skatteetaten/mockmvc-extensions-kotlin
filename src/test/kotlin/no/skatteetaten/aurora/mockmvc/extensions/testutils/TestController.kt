@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.time.Instant
 
@@ -35,6 +36,9 @@ class TestController {
     @GetMapping("/test-with-header")
     fun getTestWithHeader(@RequestHeader(value = HttpHeaders.AUTHORIZATION) authorization: String) =
         """{ "header": "$authorization" }"""
+
+    @GetMapping("/test-with-request-params")
+    fun getTestWithRequestParams(@RequestParam test: String) = """ { "params": "$test" } """
 
     @GetMapping("/test-with-object")
     fun getTestWithObject(): String = jacksonObjectMapper().writeValueAsString(TestObject())
