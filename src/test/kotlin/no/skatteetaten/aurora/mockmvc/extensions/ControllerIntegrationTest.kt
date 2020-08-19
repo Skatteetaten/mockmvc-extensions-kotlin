@@ -130,4 +130,11 @@ class ControllerIntegrationTest {
             statusIsOk().printResponseBody()
         }
     }
+
+    @Test
+    fun `Get request with request params and placeholders`() {
+        mockMvc.get(Path("/{test}?test=test123", "test-with-request-params")) {
+            statusIsOk().printResponseBody()
+        }
+    }
 }

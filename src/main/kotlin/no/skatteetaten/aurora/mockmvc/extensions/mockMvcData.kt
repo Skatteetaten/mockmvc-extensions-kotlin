@@ -10,29 +10,22 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.test.web.servlet.ResultActions
-import java.net.URI
-import java.net.URISyntaxException
+import org.springframework.web.util.UriComponentsBuilder
 
 data class MockMvcData(val path: Path, val results: ResultActions) : ResultActions by results {
     private val placeholder = Regex(pattern = "\\{.+?}")
-    private val requestUrl = path.url
+    private val requestUrl =  UriComponentsBuilder.fromUriString(path.url).replaceQuery("").build().toUriString()
 
     fun request(method: HttpMethod): MappingBuilder {
         val url = getWireMockUrl()
-        val urlWithoutQueryParams = try {
-            val uri = URI(requestUrl)
-            uri.query?.let { uri.path } ?: requestUrl
-        } catch (e: URISyntaxException) {
-            requestUrl
-        }
 
         return when (method) {
-            HttpMethod.GET -> url?.let { WireMock.get(it) } ?: WireMock.get(urlWithoutQueryParams)
-            HttpMethod.POST -> url?.let { WireMock.post(it) } ?: WireMock.post(urlWithoutQueryParams)
-            HttpMethod.PUT -> url?.let { WireMock.put(it) } ?: WireMock.put(urlWithoutQueryParams)
+            HttpMethod.GET -> url?.let { WireMock.get(it) } ?: WireMock.get(requestUrl)
+            HttpMethod.POST -> url?.let { WireMock.post(it) } ?: WireMock.post(requestUrl)
+            HttpMethod.PUT -> url?.let { WireMock.put(it) } ?: WireMock.put(requestUrl)
             HttpMethod.PATCH -> url?.let { WireMock.patch(it) }
-                ?: WireMock.patch(UrlPattern(AnythingPattern(urlWithoutQueryParams), false))
-            HttpMethod.DELETE -> url?.let { WireMock.delete(it) } ?: WireMock.delete(urlWithoutQueryParams)
+                ?: WireMock.patch(UrlPattern(AnythingPattern(requestUrl), false))
+            HttpMethod.DELETE -> url?.let { WireMock.delete(it) } ?: WireMock.delete(requestUrl)
             else -> throw IllegalArgumentException("MockMvc extensions does not support ${method.name}")
         }
     }

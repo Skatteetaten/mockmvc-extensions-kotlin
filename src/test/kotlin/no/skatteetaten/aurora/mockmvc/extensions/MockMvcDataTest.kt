@@ -23,7 +23,7 @@ class MockMvcDataTest {
         val urlPattern = mockMvcData.getWireMockUrl()
 
         val regex = urlPattern?.pattern?.value ?: ""
-        assertThat("/test/abc123/testing/abc-123?key=value").matches(regex.toRegex())
+        assertThat("/test/abc123/testing/abc-123").matches(regex.toRegex())
     }
 
     @ParameterizedTest
