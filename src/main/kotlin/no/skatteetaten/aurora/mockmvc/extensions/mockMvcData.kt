@@ -10,13 +10,15 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.test.web.servlet.ResultActions
+import org.springframework.web.util.UriComponentsBuilder
 
 data class MockMvcData(val path: Path, val results: ResultActions) : ResultActions by results {
     private val placeholder = Regex(pattern = "\\{.+?}")
-    private val requestUrl = path.url
+    private val requestUrl =  UriComponentsBuilder.fromUriString(path.url).replaceQuery("").build().toUriString()
 
     fun request(method: HttpMethod): MappingBuilder {
         val url = getWireMockUrl()
+
         return when (method) {
             HttpMethod.GET -> url?.let { WireMock.get(it) } ?: WireMock.get(requestUrl)
             HttpMethod.POST -> url?.let { WireMock.post(it) } ?: WireMock.post(requestUrl)
