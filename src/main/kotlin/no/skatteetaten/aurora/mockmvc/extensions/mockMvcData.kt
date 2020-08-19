@@ -10,6 +10,8 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.test.web.servlet.ResultActions
+import java.net.URI
+import java.net.URISyntaxException
 
 data class MockMvcData(val path: Path, val results: ResultActions) : ResultActions by results {
     private val placeholder = Regex(pattern = "\\{.+?}")
@@ -17,13 +19,20 @@ data class MockMvcData(val path: Path, val results: ResultActions) : ResultActio
 
     fun request(method: HttpMethod): MappingBuilder {
         val url = getWireMockUrl()
+        val urlWithoutQueryParams = try {
+            val uri = URI(requestUrl)
+            uri.query?.let { uri.path } ?: requestUrl
+        } catch (e: URISyntaxException) {
+            requestUrl
+        }
+
         return when (method) {
-            HttpMethod.GET -> url?.let { WireMock.get(it) } ?: WireMock.get(requestUrl)
-            HttpMethod.POST -> url?.let { WireMock.post(it) } ?: WireMock.post(requestUrl)
-            HttpMethod.PUT -> url?.let { WireMock.put(it) } ?: WireMock.put(requestUrl)
+            HttpMethod.GET -> url?.let { WireMock.get(it) } ?: WireMock.get(urlWithoutQueryParams)
+            HttpMethod.POST -> url?.let { WireMock.post(it) } ?: WireMock.post(urlWithoutQueryParams)
+            HttpMethod.PUT -> url?.let { WireMock.put(it) } ?: WireMock.put(urlWithoutQueryParams)
             HttpMethod.PATCH -> url?.let { WireMock.patch(it) }
-                ?: WireMock.patch(UrlPattern(AnythingPattern(requestUrl), false))
-            HttpMethod.DELETE -> url?.let { WireMock.delete(it) } ?: WireMock.delete(requestUrl)
+                ?: WireMock.patch(UrlPattern(AnythingPattern(urlWithoutQueryParams), false))
+            HttpMethod.DELETE -> url?.let { WireMock.delete(it) } ?: WireMock.delete(urlWithoutQueryParams)
             else -> throw IllegalArgumentException("MockMvc extensions does not support ${method.name}")
         }
     }

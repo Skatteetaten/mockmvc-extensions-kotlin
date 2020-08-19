@@ -58,12 +58,12 @@
     <maven.compiler.target>1.8</maven.compiler.target>
 
     <springboot.version>2.3.0.RELEASE</springboot.version>
-    <springcontract.version>2.2.3.RELEASE</springcontract.version>
+    <springcontract.version>2.2.4.RELEASE</springcontract.version>
     <springrestdocs.version>2.0.4.RELEASE</springrestdocs.version>
-    <jackson.version>2.11.0</jackson.version>
+    <jackson.version>2.11.2</jackson.version>
     <junit.jupiter.version>5.6.2</junit.jupiter.version>
-    <mockwebserver.version>4.7.2</mockwebserver.version>
-    <kotlinlogging.version>1.7.9</kotlinlogging.version>
+    <mockwebserver.version>4.8.1</mockwebserver.version>
+    <kotlinlogging.version>1.8.3</kotlinlogging.version>
 
     <assertk.version>0.22</assertk.version>
     <mockk.version>1.10.0</mockk.version>
