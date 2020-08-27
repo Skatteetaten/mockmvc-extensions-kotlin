@@ -42,7 +42,7 @@ class MockMvcDataTest {
         val mockMvcData = MockMvcData(Path("/test?key=value"), mockk())
         val mappingBuilder = mockMvcData.request(method)
 
-        assertThat(mappingBuilder.build().request.urlMatcher.isRegex).isFalse()
+        assertThat(mappingBuilder.build().request.urlMatcher.isRegex).isTrue()
     }
 
     @Test
@@ -58,7 +58,7 @@ class MockMvcDataTest {
         val mockMvcData = MockMvcData(Path("/test/testing"), mockk())
         val urlPattern = mockMvcData.getWireMockUrl()
 
-        assertThat(urlPattern).isNull()
+        assertThat(urlPattern.pattern.value).isEqualTo("/test/testing")
     }
 
     @Test

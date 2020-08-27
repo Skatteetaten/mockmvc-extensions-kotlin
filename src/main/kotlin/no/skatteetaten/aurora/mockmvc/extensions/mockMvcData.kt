@@ -2,7 +2,6 @@ package no.skatteetaten.aurora.mockmvc.extensions
 
 import com.github.tomakehurst.wiremock.client.MappingBuilder
 import com.github.tomakehurst.wiremock.client.WireMock
-import com.github.tomakehurst.wiremock.matching.AnythingPattern
 import com.github.tomakehurst.wiremock.matching.RegexPattern
 import com.github.tomakehurst.wiremock.matching.UrlPattern
 import org.springframework.cloud.contract.wiremock.restdocs.WireMockRestDocs
@@ -14,34 +13,28 @@ import org.springframework.web.util.UriComponentsBuilder
 
 data class MockMvcData(val path: Path, val results: ResultActions) : ResultActions by results {
     private val placeholder = Regex(pattern = "\\{.+?}")
-    private val requestUrl =  UriComponentsBuilder.fromUriString(path.url).replaceQuery("").build().toUriString()
+    private val uriComponents = UriComponentsBuilder.fromUriString(path.url).build()
 
     fun request(method: HttpMethod): MappingBuilder {
         val url = getWireMockUrl()
-
-        return when (method) {
-            HttpMethod.GET -> url?.let { WireMock.get(it) } ?: WireMock.get(requestUrl)
-            HttpMethod.POST -> url?.let { WireMock.post(it) } ?: WireMock.post(requestUrl)
-            HttpMethod.PUT -> url?.let { WireMock.put(it) } ?: WireMock.put(requestUrl)
-            HttpMethod.PATCH -> url?.let { WireMock.patch(it) }
-                ?: WireMock.patch(UrlPattern(AnythingPattern(requestUrl), false))
-            HttpMethod.DELETE -> url?.let { WireMock.delete(it) } ?: WireMock.delete(requestUrl)
+        val wiremock = when (method) {
+            HttpMethod.GET -> WireMock.get(url)
+            HttpMethod.POST -> WireMock.post(url)
+            HttpMethod.PUT -> WireMock.put(url)
+            HttpMethod.PATCH -> WireMock.patch(url)
+            HttpMethod.DELETE -> WireMock.delete(url)
             else -> throw IllegalArgumentException("MockMvc extensions does not support ${method.name}")
         }
+
+        val queryParams = uriComponents.queryParams.mapValues { RegexPattern(".+") }
+        return wiremock.withQueryParams(queryParams)
     }
 
-    fun getWireMockUrl(): UrlPattern? =
-        if (requestUrl.contains(placeholder)) {
-            UrlPattern(
-                RegexPattern(
-                    requestUrl
-                        .replace(placeholder, Regex.escapeReplacement("[\\w-\\.]+"))
-                        .replace("?", "\\?")
-                ), true
-            )
-        } else {
-            null
-        }
+    fun getWireMockUrl() = UrlPattern(
+        RegexPattern(
+            uriComponents.path!!.replace(placeholder, Regex.escapeReplacement("[\\w-\\.]+"))
+        ), true
+    )
 
     fun setupWireMock(headers: HttpHeaders?, method: HttpMethod): MockMvcData {
         val mappingBuilder = this.request(method)
