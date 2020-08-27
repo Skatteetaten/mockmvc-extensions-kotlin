@@ -3,6 +3,7 @@ package no.skatteetaten.aurora.mockmvc.extensions
 import com.github.tomakehurst.wiremock.client.MappingBuilder
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.matching.RegexPattern
+import com.github.tomakehurst.wiremock.matching.UrlPathPattern
 import com.github.tomakehurst.wiremock.matching.UrlPattern
 import org.springframework.cloud.contract.wiremock.restdocs.WireMockRestDocs
 import org.springframework.http.HttpHeaders
@@ -30,7 +31,7 @@ data class MockMvcData(val path: Path, val results: ResultActions) : ResultActio
         return wiremock.withQueryParams(queryParams)
     }
 
-    fun getWireMockUrl() = UrlPattern(
+    fun getWireMockUrl() = UrlPathPattern(
         RegexPattern(
             uriComponents.path!!.replace(placeholder, Regex.escapeReplacement("[\\w-\\.]+"))
         ), true
