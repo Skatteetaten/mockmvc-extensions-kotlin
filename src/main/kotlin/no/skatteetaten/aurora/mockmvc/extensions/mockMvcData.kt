@@ -26,7 +26,7 @@ data class MockMvcData(val path: Path, val results: ResultActions) : ResultActio
             else -> throw IllegalArgumentException("MockMvc extensions does not support ${method.name}")
         }
 
-        val queryParams = uriComponents.queryParams.mapValues { RegexPattern("[\\w-\\.]+") }
+        val queryParams = uriComponents.queryParams.mapValues { RegexPattern(".+") }
         return wiremock.withQueryParams(queryParams)
     }
 

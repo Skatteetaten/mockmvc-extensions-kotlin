@@ -143,4 +143,11 @@ class ControllerIntegrationTest {
             statusIsOk().responseJsonPath("$.params").equalsValue("test123")
         }
     }
+
+    @Test
+    fun `Get request with request params containing underscore and slash in value`() {
+        mockMvc.get(Path("/test-with-request-params?test=test_123/234")) {
+            statusIsOk().responseJsonPath("$.params").equalsValue("test_123/234")
+        }
+    }
 }
