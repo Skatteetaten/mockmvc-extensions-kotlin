@@ -2,6 +2,7 @@ package no.skatteetaten.aurora.mockmvc.extensions.mockwebserver
 
 import assertk.Assert
 import assertk.assertThat
+import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFailure
 import assertk.assertions.isInstanceOf
@@ -10,6 +11,7 @@ import assertk.assertions.isNull
 import assertk.assertions.prop
 import assertk.assertions.support.expected
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import kotlinx.coroutines.delay
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
@@ -147,6 +149,16 @@ class MockWebServerTest {
     fun `Response timeout from server`() {
         val request = server.execute(responses = *arrayOf(jsonResponse()), timeoutInMs = 5) {}
         assertThat(request.first()).isNull()
+    }
+
+    @Test
+    fun `Execute blocking`() {
+        val requests = server.executeBlocking(jsonResponse()) {
+            delay(1)
+            RestTemplate().getForEntity<String>(server.url)
+        }
+
+        assertThat(requests).hasSize(1)
     }
 
     private fun Assert<ResponseEntity<*>>.isOk() = given { request ->
