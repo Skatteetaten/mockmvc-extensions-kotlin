@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.convertValue
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.jayway.jsonpath.JsonPath
+import kotlinx.coroutines.runBlocking
 import no.skatteetaten.aurora.mockmvc.extensions.TestObjectMapperConfigurer
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -47,7 +48,7 @@ fun Assert<List<RecordedRequest>>.containsRequest(method: HttpMethod, path: Stri
         }
     }
 
-private fun MockWebServer.enqueueJson(status: Int = 200, body: Any, objectMapper: ObjectMapper) {
+fun MockWebServer.enqueueJson(status: Int = 200, body: Any, objectMapper: ObjectMapper) {
     val json = body as? String ?: objectMapper.writeValueAsString(body)
     val response = MockResponse()
         .setResponseCode(status)
@@ -57,57 +58,34 @@ private fun MockWebServer.enqueueJson(status: Int = 200, body: Any, objectMapper
 }
 
 fun MockWebServer.execute(
-    vararg responses: MockResponse,
-    timeoutInMs: Long = 3000,
-    fn: () -> Unit
-): List<RecordedRequest?> {
-    fun takeRequests() =
-        (1..responses.size).toList().map { this.takeRequest(timeoutInMs, TimeUnit.MILLISECONDS) }
-
-    try {
-        responses.forEach { this.enqueue(it) }
-        fn()
-        return takeRequests()
-    } catch (t: Throwable) {
-        takeRequests()
-        throw t
-    }
-}
-
-fun MockWebServer.execute(
-    vararg responses: Pair<Int, Any>,
-    objectMapper: ObjectMapper = TestObjectMapperConfigurer.objectMapper,
-    timeoutInMs: Long = 3000,
-    fn: () -> Unit
-): List<RecordedRequest?> {
-    fun takeRequests() =
-        (1..responses.size).toList().map { this.takeRequest(timeoutInMs, TimeUnit.MILLISECONDS) }
-
-    try {
-        responses.forEach { this.enqueueJson(status = it.first, body = it.second, objectMapper = objectMapper) }
-        fn()
-        return takeRequests()
-    } catch (t: Throwable) {
-        takeRequests()
-        throw t
-    }
-}
-
-fun MockWebServer.execute(
     vararg responses: Any,
     objectMapper: ObjectMapper = TestObjectMapperConfigurer.objectMapper,
     timeoutInMs: Long = 3000,
     fn: () -> Unit
-): List<RecordedRequest?> {
-    fun takeRequests() =
-        (1..responses.size).toList().map { this.takeRequest(timeoutInMs, TimeUnit.MILLISECONDS) }
+): List<RecordedRequest?> = executeBlocking(
+    responses = *responses,
+    objectMapper = objectMapper,
+    timeoutInMs = timeoutInMs
+) { fn() }
 
+inline fun <reified T> MockWebServer.executeBlocking(
+    vararg responses: T,
+    objectMapper: ObjectMapper = TestObjectMapperConfigurer.objectMapper,
+    timeoutInMs: Long = 3000,
+    noinline fn: suspend () -> Unit
+): List<RecordedRequest?> = runBlocking {
     try {
-        responses.forEach { this.enqueueJson(body = it, objectMapper = objectMapper) }
+        responses.forEach {
+            when (it) {
+                is MockResponse -> enqueue(it)
+                is Pair<*, *> -> enqueueJson(status = it.first as Int, body = it.second!!, objectMapper = objectMapper)
+                is Any -> enqueueJson(body = it, objectMapper = objectMapper)
+            }
+        }
         fn()
-        return takeRequests()
+        responses.takeRequests(timeoutInMs, this@executeBlocking)
     } catch (t: Throwable) {
-        takeRequests()
+        responses.takeRequests(timeoutInMs, this@executeBlocking)
         throw t
     }
 }
@@ -156,3 +134,6 @@ fun jsonResponse(body: Any? = null): MockResponse {
         }
     } ?: response
 }
+
+fun Array<*>.takeRequests(timeoutInMs: Long, mockWebServer: MockWebServer) =
+    (1..this.size).toList().map { mockWebServer.takeRequest(timeoutInMs, TimeUnit.MILLISECONDS) }
