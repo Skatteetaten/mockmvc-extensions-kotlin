@@ -48,7 +48,7 @@ fun Assert<List<RecordedRequest>>.containsRequest(method: HttpMethod, path: Stri
         }
     }
 
-private fun MockWebServer.enqueueJson(status: Int = 200, body: Any, objectMapper: ObjectMapper) {
+fun MockWebServer.enqueueJson(status: Int = 200, body: Any, objectMapper: ObjectMapper) {
     val json = body as? String ?: objectMapper.writeValueAsString(body)
     val response = MockResponse()
         .setResponseCode(status)
@@ -58,64 +58,34 @@ private fun MockWebServer.enqueueJson(status: Int = 200, body: Any, objectMapper
 }
 
 fun MockWebServer.execute(
-    vararg responses: MockResponse,
-    timeoutInMs: Long = 3000,
-    fn: () -> Unit
-): List<RecordedRequest?> {
-    try {
-        responses.forEach { this.enqueue(it) }
-        fn()
-        return responses.takeRequests(timeoutInMs, this)
-    } catch (t: Throwable) {
-        responses.takeRequests(timeoutInMs, this)
-        throw t
-    }
-}
-
-fun MockWebServer.execute(
-    vararg responses: Pair<Int, Any>,
-    objectMapper: ObjectMapper = TestObjectMapperConfigurer.objectMapper,
-    timeoutInMs: Long = 3000,
-    fn: () -> Unit
-): List<RecordedRequest?> {
-    try {
-        responses.forEach { this.enqueueJson(status = it.first, body = it.second, objectMapper = objectMapper) }
-        fn()
-        return responses.takeRequests(timeoutInMs, this)
-    } catch (t: Throwable) {
-        responses.takeRequests(timeoutInMs, this)
-        throw t
-    }
-}
-
-fun MockWebServer.executeBlocking(
     vararg responses: Any,
     objectMapper: ObjectMapper = TestObjectMapperConfigurer.objectMapper,
     timeoutInMs: Long = 3000,
-    fn: suspend () -> Unit
+    fn: () -> Unit
+): List<RecordedRequest?> = executeBlocking(
+    responses = *responses,
+    objectMapper = objectMapper,
+    timeoutInMs = timeoutInMs
+) { fn() }
+
+inline fun <reified T> MockWebServer.executeBlocking(
+    vararg responses: T,
+    objectMapper: ObjectMapper = TestObjectMapperConfigurer.objectMapper,
+    timeoutInMs: Long = 3000,
+    noinline fn: suspend () -> Unit
 ): List<RecordedRequest?> = runBlocking {
     try {
-        responses.forEach { enqueueJson(body = it, objectMapper = objectMapper) }
+        responses.forEach {
+            when (it) {
+                is MockResponse -> enqueue(it)
+                is Pair<*, *> -> enqueueJson(status = it.first as Int, body = it.second!!, objectMapper = objectMapper)
+                is Any -> enqueueJson(body = it, objectMapper = objectMapper)
+            }
+        }
         fn()
         responses.takeRequests(timeoutInMs, this@executeBlocking)
     } catch (t: Throwable) {
         responses.takeRequests(timeoutInMs, this@executeBlocking)
-        throw t
-    }
-}
-
-fun MockWebServer.execute(
-    vararg responses: Any,
-    objectMapper: ObjectMapper = TestObjectMapperConfigurer.objectMapper,
-    timeoutInMs: Long = 3000,
-    fn: () -> Unit
-): List<RecordedRequest?> {
-    try {
-        responses.forEach { this.enqueueJson(body = it, objectMapper = objectMapper) }
-        fn()
-        return responses.takeRequests(timeoutInMs, this)
-    } catch (t: Throwable) {
-        responses.takeRequests(timeoutInMs, this)
         throw t
     }
 }
