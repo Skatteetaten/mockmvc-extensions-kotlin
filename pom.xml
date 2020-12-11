@@ -67,7 +67,8 @@
     <coroutines.version>1.4.2</coroutines.version>
 
     <assertk.version>0.23</assertk.version>
-    <mockk.version>1.10.3</mockk.version>
+    <mockk.version>1.10.3-jdk8</mockk.version>
+    <mockito.version>3.6.28</mockito.version>
   </properties>
 
   <dependencyManagement>
@@ -110,6 +111,18 @@
         <version>${springboot.version}</version>
         <type>pom</type>
         <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>${mockito.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-junit-jupiter</artifactId>
+        <version>${mockito.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
