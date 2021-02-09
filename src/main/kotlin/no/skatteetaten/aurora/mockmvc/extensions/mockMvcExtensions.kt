@@ -10,6 +10,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.MvcResult
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import javax.servlet.http.Cookie
 
 fun HttpHeaders.authorization(value: String): HttpHeaders {
     this.set(HttpHeaders.AUTHORIZATION, value)
@@ -31,45 +32,51 @@ fun HttpHeaders.header(key: String, value: String): HttpHeaders {
 fun MockMvc.get(
     path: Path,
     headers: HttpHeaders? = null,
+    cookies: Array<Cookie>? = null,
     docsIdentifier: String? = null,
     fn: MockMvcData.() -> Unit
-) = this.execute(HttpMethod.GET, headers, null, path, fn, docsIdentifier)
+) = this.execute(HttpMethod.GET, headers, cookies, null, path, fn, docsIdentifier)
 
 fun MockMvc.post(
     path: Path,
     body: Any? = null,
     headers: HttpHeaders? = null,
+    cookies: Array<Cookie>? = null,
     docsIdentifier: String? = null,
     fn: MockMvcData.() -> Unit
-) = this.execute(HttpMethod.POST, headers, body, path, fn, docsIdentifier)
+) = this.execute(HttpMethod.POST, headers, cookies, body, path, fn, docsIdentifier)
 
 fun MockMvc.put(
     path: Path,
     body: Any? = null,
     headers: HttpHeaders? = null,
+    cookies: Array<Cookie>? = null,
     docsIdentifier: String? = null,
     fn: MockMvcData.() -> Unit
-) = this.execute(HttpMethod.PUT, headers, body, path, fn, docsIdentifier)
+) = this.execute(HttpMethod.PUT, headers, cookies, body, path, fn, docsIdentifier)
 
 fun MockMvc.patch(
     path: Path,
     body: Any? = null,
     headers: HttpHeaders? = null,
+    cookies: Array<Cookie>? = null,
     docsIdentifier: String? = null,
     fn: MockMvcData.() -> Unit
-) = this.execute(HttpMethod.PATCH, headers, body, path, fn, docsIdentifier)
+) = this.execute(HttpMethod.PATCH, headers, cookies, body, path, fn, docsIdentifier)
 
 fun MockMvc.delete(
     path: Path,
     body: Any? = null,
     headers: HttpHeaders? = null,
+    cookies: Array<Cookie>? = null,
     docsIdentifier: String? = null,
     fn: MockMvcData.() -> Unit
-) = this.execute(HttpMethod.DELETE, headers, body, path, fn, docsIdentifier)
+) = this.execute(HttpMethod.DELETE, headers, cookies, body, path, fn, docsIdentifier)
 
 private fun MockMvc.execute(
     method: HttpMethod,
     headers: HttpHeaders?,
+    cookies: Array<Cookie>?,
     body: Any?,
     path: Path,
     fn: (mockMvcData: MockMvcData) -> Unit,
@@ -78,6 +85,7 @@ private fun MockMvc.execute(
     val builder = MockMvcRequestBuilders
         .request(method, path.url, *path.vars)
         .addHeaders(headers)
+        .addCookies(cookies)
         .addBody(body)
 
     val resultActions = this.perform(builder)
@@ -91,6 +99,9 @@ private fun MockMvc.execute(
 
 private fun MockHttpServletRequestBuilder.addHeaders(headers: HttpHeaders?) =
     headers?.let { this.headers(it) } ?: this
+
+private fun MockHttpServletRequestBuilder.addCookies(cookies: Array<Cookie>?) =
+    cookies?.let { this.cookie(*cookies) } ?: this
 
 private fun MockHttpServletRequestBuilder.addBody(body: Any?) =
     body?.let {
