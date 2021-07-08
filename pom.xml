@@ -51,24 +51,22 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <kotlin.version>1.4.21</kotlin.version>
+    <kotlin.version>1.5.20</kotlin.version>
     <kotlin.code.style>official</kotlin.code.style>
     <kotlin.compiler.jvmTarget>1.8</kotlin.compiler.jvmTarget>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
 
-    <springboot.version>2.3.7.RELEASE</springboot.version>
-    <springcontract.version>2.2.4.RELEASE</springcontract.version>
+    <springboot.version>2.5.2</springboot.version>
+    <springcontract.version>3.0.3</springcontract.version>
     <springrestdocs.version>2.0.5.RELEASE</springrestdocs.version>
-    <jackson.version>2.11.3</jackson.version>
-    <junit.jupiter.version>5.7.0</junit.jupiter.version>
-    <okhttp.version>4.9.0</okhttp.version>
-    <kotlinlogging.version>1.12.0</kotlinlogging.version>
-    <coroutines.version>1.4.2</coroutines.version>
+    <jackson.version>2.12.4</jackson.version>
+    <junit.jupiter.version>5.8.0-M1</junit.jupiter.version>
+    <kotlinlogging.version>2.0.8</kotlinlogging.version>
+    <coroutines.version>1.5.0</coroutines.version>
 
-    <assertk.version>0.23</assertk.version>
-    <mockk.version>1.10.3-jdk8</mockk.version>
-    <mockito.version>3.6.28</mockito.version>
+    <assertk.version>0.24</assertk.version>
+    <mockk.version>1.12.0</mockk.version>
   </properties>
 
   <dependencyManagement>
@@ -90,14 +88,6 @@
       </dependency>
 
       <dependency>
-        <groupId>com.squareup.okhttp3</groupId>
-        <artifactId>okhttp-bom</artifactId>
-        <version>${okhttp.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-
-      <dependency>
         <groupId>com.fasterxml.jackson</groupId>
         <artifactId>jackson-bom</artifactId>
         <version>${jackson.version}</version>
@@ -113,17 +103,6 @@
         <scope>import</scope>
       </dependency>
 
-      <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-core</artifactId>
-        <version>${mockito.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-junit-jupiter</artifactId>
-        <version>${mockito.version}</version>
-      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -158,10 +137,6 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.squareup.okhttp3</groupId>
-      <artifactId>mockwebserver</artifactId>
     </dependency>
     <dependency>
       <groupId>com.willowtreeapps.assertk</groupId>
@@ -252,7 +227,7 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.6</version>
+        <version>0.8.7</version>
         <configuration>
           <destFile>${sonar.jacoco.reportPaths}</destFile>
           <append>true</append>
@@ -277,7 +252,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.6</version>
+            <version>3.0.1</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>
@@ -301,7 +276,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
-            <version>2.4</version>
+            <version>3.2.1</version>
             <executions>
               <execution>
                 <id>attach-sources</id>
@@ -314,7 +289,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-jar-plugin</artifactId>
-            <version>3.1.0</version>
+            <version>3.2.0</version>
             <executions>
               <execution>
                 <id>default-jar</id>
