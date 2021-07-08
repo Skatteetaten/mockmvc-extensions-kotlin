@@ -10,7 +10,6 @@ import com.fasterxml.jackson.module.kotlin.convertValue
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.jayway.jsonpath.JsonPath
 import kotlinx.coroutines.runBlocking
-import no.skatteetaten.aurora.mockmvc.extensions.TestObjectMapperConfigurer
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
@@ -59,7 +58,7 @@ fun MockWebServer.enqueueJson(status: Int = 200, body: Any, objectMapper: Object
 
 fun MockWebServer.execute(
     vararg responses: Any,
-    objectMapper: ObjectMapper = TestObjectMapperConfigurer.objectMapper,
+    objectMapper: ObjectMapper = jacksonObjectMapper(),
     timeoutInMs: Long = 3000,
     fn: () -> Unit
 ): List<RecordedRequest?> = executeBlocking(
@@ -70,7 +69,7 @@ fun MockWebServer.execute(
 
 inline fun <reified T> MockWebServer.executeBlocking(
     vararg responses: T,
-    objectMapper: ObjectMapper = TestObjectMapperConfigurer.objectMapper,
+    objectMapper: ObjectMapper = jacksonObjectMapper(),
     timeoutInMs: Long = 3000,
     noinline fn: suspend () -> Unit
 ): List<RecordedRequest?> = runBlocking {
@@ -99,7 +98,7 @@ fun MockResponse.setJsonFileAsBody(fileName: String): MockResponse {
 
 inline fun <reified T> RecordedRequest.bodyAsObject(
     path: String = "$",
-    objectMapper: ObjectMapper = TestObjectMapperConfigurer.objectMapper
+    objectMapper: ObjectMapper = jacksonObjectMapper()
 ): T {
     val content: Any = JsonPath.parse(String(body.readByteArray())).read(path)
     return objectMapper.convertValue(content)
